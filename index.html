@@ -3,182 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Language Code Tester</title>
+    <title>All-in-One Code Tester</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.10.5/brython.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.10.5/brython_stdlib.min.js"></script>
     <style>
-        :root {
-            --primary-color: #4a6fa5;
-            --secondary-color: #166088;
-            --dark-color: #0a1128;
-            --light-color: #f5f5f5;
-            --success-color: #4caf50;
-            --danger-color: #f44336;
-        }
-        
+        /* Global Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            display: flex;
-            min-height: 100vh;
-            background-color: var(--light-color);
-            color: var(--dark-color);
-        }
-        
-        /* Sidebar styles */
-        .sidebar {
-            width: 250px;
-            background-color: var(--dark-color);
-            color: white;
-            padding: 20px 0;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
             display: flex;
             flex-direction: column;
             height: 100vh;
-            position: fixed;
         }
-        
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         .logo {
-            padding: 0 20px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
-        }
-        
-        .logo h1 {
             font-size: 1.5rem;
-        }
-        
-        .nav-links {
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-        
-        .nav-item {
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        .nav-item.active {
-            background-color: var(--primary-color);
-        }
-        
-        .delete-page {
-            color: var(--danger-color);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9rem;
-            padding: 2px 5px;
-            border-radius: 3px;
-        }
-        
-        .delete-page:hover {
-            background-color: rgba(244, 67, 54, 0.2);
-        }
-        
-        .add-page {
-            padding: 15px 20px;
-            margin-top: auto;
-        }
-        
-        .add-page-btn {
-            width: 100%;
-            padding: 10px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
             font-weight: bold;
-            transition: background-color 0.3s;
         }
-        
-        .add-page-btn:hover {
-            background-color: var(--secondary-color);
-        }
-        
-        /* Main content styles */
-        .main-content {
-            flex-grow: 1;
-            margin-left: 250px;
+
+        .main-container {
             display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        
-        .toolbar {
-            padding: 15px 20px;
-            background-color: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .language-selector {
-            padding: 8px 12px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-        
-        .save-btn {
-            padding: 8px 15px;
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        
-        .save-btn:hover {
-            background-color: #3d8b40;
-        }
-        
-        .editor-container {
-            flex-grow: 1;
-            display: flex;
+            flex: 1;
             overflow: hidden;
         }
-        
+
+        /* File Explorer */
+        .file-explorer {
+            width: 250px;
+            background-color: #34495e;
+            color: white;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .file-explorer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .add-file-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .file-list {
+            list-style: none;
+        }
+
+        .file-item {
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 0.3rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .file-item:hover {
+            background-color: #3d566e;
+        }
+
+        .file-item.active {
+            background-color: #2980b9;
+        }
+
+        .file-actions {
+            display: none;
+        }
+
+        .file-item:hover .file-actions {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .file-action {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Editor Section */
+        .editor-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .editor-toolbar {
+            background-color: #ecf0f1;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .filename-display {
+            font-weight: bold;
+        }
+
+        .run-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .editor-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
         .code-editor {
-            flex-grow: 1;
+            flex: 1;
+            padding: 1rem;
             border: none;
             resize: none;
-            padding: 20px;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Courier New', monospace;
             font-size: 14px;
-            line-height: 1.5;
-            background-color: #f8f8f8;
-            border-right: 1px solid #ddd;
+            background-color: #f8f9fa;
+            outline: none;
         }
-        
-        .preview-container {
-            flex-basis: 50%;
+
+        /* Preview Section */
+        .preview-section {
+            flex: 1;
+            padding: 1rem;
             overflow: auto;
-            padding: 20px;
             background-color: white;
+            border-left: 1px solid #ddd;
         }
-        
-        .preview-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background-color: white;
+
+        .preview-title {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #7f8c8d;
         }
-        
-        /* Modal styles */
+
+        /* Splitter */
+        .splitter {
+            width: 5px;
+            background-color: #ddd;
+            cursor: col-resize;
+        }
+
+        /* Add File Modal */
         .modal {
             display: none;
             position: fixed;
@@ -187,513 +186,537 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            z-index: 100;
             justify-content: center;
             align-items: center;
         }
-        
+
         .modal-content {
             background-color: white;
-            padding: 20px;
+            padding: 2rem;
             border-radius: 8px;
             width: 400px;
             max-width: 90%;
         }
-        
+
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
         }
-        
-        .modal-header h2 {
-            font-size: 1.3rem;
-        }
-        
-        .close-btn {
+
+        .close-modal {
             background: none;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: #777;
         }
-        
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 1rem;
         }
-        
+
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 0.5rem;
             font-weight: bold;
         }
-        
+
         .form-group input, .form-group select {
             width: 100%;
-            padding: 8px 10px;
+            padding: 0.5rem;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
-        
+
         .modal-footer {
             display: flex;
             justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
         }
-        
+
         .btn {
-            padding: 8px 15px;
+            padding: 0.5rem 1rem;
+            border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-weight: bold;
         }
-        
+
         .btn-primary {
-            background-color: var(--primary-color);
+            background-color: #3498db;
             color: white;
-            border: none;
         }
-        
+
         .btn-secondary {
-            background-color: #ddd;
-            border: none;
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        /* Console Output */
+        #console-output {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 0.5rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            border-radius: 4px;
         }
     </style>
 </head>
-<body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo">
-            <h1>Code Tester</h1>
+<body onload="brython()">
+    <header>
+        <div class="logo">Code Tester</div>
+        <div>
+            <button id="new-file-btn" class="run-btn">+ New File</button>
         </div>
-        <div class="nav-links" id="navLinks">
-            <!-- Pages will be added here dynamically -->
-        </div>
-        <div class="add-page">
-            <button class="add-page-btn" id="addPageBtn">+ Add Page</button>
-        </div>
-    </div>
+    </header>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="toolbar">
-            <div>
-                <select class="language-selector" id="languageSelector">
-                    <option value="html">HTML</option>
-                    <option value="css">CSS</option>
-                    <option value="javascript">JavaScript</option>
-                    <option value="python">Python</option>
-                    <option value="java">Java</option>
-                    <option value="csharp">C#</option>
-                    <option value="cpp">C++</option>
-                    <option value="php">PHP</option>
-                    <option value="ruby">Ruby</option>
-                    <option value="swift">Swift</option>
-                    <option value="typescript">TypeScript</option>
-                    <option value="nodejs">Node.js</option>
-                </select>
+    <div class="main-container">
+        <div class="file-explorer">
+            <div class="file-explorer-header">
+                <h3>Files</h3>
+                <button class="add-file-btn" id="add-file-btn">+</button>
             </div>
-            <div>
-                <button class="save-btn" id="saveBtn">Save</button>
-            </div>
+            <ul class="file-list" id="file-list">
+                <!-- Files will be added here dynamically -->
+            </ul>
         </div>
-        <div class="editor-container">
-            <textarea class="code-editor" id="codeEditor" spellcheck="false"></textarea>
-            <div class="preview-container">
-                <iframe class="preview-frame" id="previewFrame"></iframe>
+
+        <div class="editor-section">
+            <div class="editor-toolbar">
+                <div class="filename-display" id="filename-display">No file selected</div>
+                <button class="run-btn" id="run-code-btn">Run Code</button>
+            </div>
+            <div class="editor-container">
+                <textarea id="code-editor" class="code-editor" placeholder="Select or create a file to start coding..."></textarea>
+                <div class="splitter" id="splitter"></div>
+                <div class="preview-section" id="preview-section">
+                    <div class="preview-title">Output Preview</div>
+                    <div id="output-preview"></div>
+                    <div id="console-output"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Add Page Modal -->
-    <div class="modal" id="addPageModal">
+    <!-- Add File Modal -->
+    <div class="modal" id="add-file-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Add New Page</h2>
-                <button class="close-btn" id="closeModalBtn">&times;</button>
+                <h3>Create New File</h3>
+                <button class="close-modal">&times;</button>
             </div>
             <div class="form-group">
-                <label for="pageName">Page Name</label>
-                <input type="text" id="pageName" placeholder="Enter page name (without extension)">
+                <label for="new-filename">File Name</label>
+                <input type="text" id="new-filename" placeholder="e.g., index.html">
             </div>
             <div class="form-group">
-                <label for="pageType">Page Type</label>
-                <select id="pageType">
+                <label for="file-type">File Type</label>
+                <select id="file-type">
                     <option value="html">HTML</option>
                     <option value="css">CSS</option>
                     <option value="js">JavaScript</option>
-                    <option value="python">Python</option>
-                    <option value="java">Java</option>
-                    <option value="csharp">C#</option>
-                    <option value="cpp">C++</option>
-                    <option value="php">PHP</option>
-                    <option value="ruby">Ruby</option>
-                    <option value="swift">Swift</option>
-                    <option value="ts">TypeScript</option>
-                    <option value="node">Node.js</option>
+                    <option value="py">Python</option>
                 </select>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancelAddPageBtn">Cancel</button>
-                <button class="btn btn-primary" id="confirmAddPageBtn">Add Page</button>
+                <button class="btn btn-secondary" id="cancel-add-file">Cancel</button>
+                <button class="btn btn-primary" id="confirm-add-file">Create</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Default files
-        const defaultFiles = {
-            'index.html': {
-                name: 'index.html',
-                type: 'html',
-                content: `<!DOCTYPE html>
+        // File system and application state
+        const state = {
+            files: {
+                'index.html': {
+                    name: 'index.html',
+                    type: 'html',
+                    content: `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
-    <link rel="stylesheet" href="style.css">
+    <title>My Page</title>
 </head>
 <body>
-    <h1>Welcome to My Website</h1>
-    <p>This is the home page of my website.</p>
-    <script src="script.js"></script>
+    <h1>Hello World!</h1>
+    <p>Welcome to my page.</p>
 </body>
 </html>`
-            },
-            'style.css': {
-                name: 'style.css',
-                type: 'css',
-                content: `body {
+                },
+                'style.css': {
+                    name: 'style.css',
+                    type: 'css',
+                    content: `body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 20px;
-    color: #333;
     background-color: #f4f4f4;
 }
 
 h1 {
-    color: #4a6fa5;
+    color: #333;
 }`
+                },
+                'script.js': {
+                    name: 'script.js',
+                    type: 'js',
+                    content: `console.log('Hello from JavaScript!');
+
+function greet(name) {
+    return 'Hello, ' + name + '!';
+}
+
+// Try calling the function
+console.log(greet('World'));`
+                },
+                'main.py': {
+                    name: 'main.py',
+                    type: 'py',
+                    content: `print("Hello from Python!")
+
+def factorial(n):
+    if n == 0:
+        return 1
+    else:
+        return n * factorial(n-1)
+
+# Test the function
+print(factorial(5))`
+                }
             },
-            'script.js': {
-                name: 'script.js',
-                type: 'javascript',
-                content: `console.log('Hello from script.js!');
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Your JavaScript code here
-    alert('Welcome to my website!');
-});`
-            }
-        };
-
-        // Language to file extension mapping
-        const languageExtensions = {
-            'html': '.html',
-            'css': '.css',
-            'javascript': '.js',
-            'python': '.py',
-            'java': '.java',
-            'csharp': '.cs',
-            'cpp': '.cpp',
-            'php': '.php',
-            'ruby': '.rb',
-            'swift': '.swift',
-            'typescript': '.ts',
-            'nodejs': '.js',
-            'js': '.js',
-            'ts': '.ts',
-            'node': '.js'
-        };
-
-        // Language to CodeMirror mode mapping
-        const languageModes = {
-            'html': 'htmlmixed',
-            'css': 'css',
-            'javascript': 'javascript',
-            'python': 'python',
-            'java': 'text/x-java',
-            'csharp': 'text/x-csharp',
-            'cpp': 'text/x-c++src',
-            'php': 'php',
-            'ruby': 'ruby',
-            'swift': 'swift',
-            'typescript': 'text/typescript',
-            'nodejs': 'javascript',
-            'js': 'javascript',
-            'ts': 'text/typescript',
-            'node': 'javascript'
+            currentFile: null
         };
 
         // DOM elements
-        const navLinks = document.getElementById('navLinks');
-        const addPageBtn = document.getElementById('addPageBtn');
-        const addPageModal = document.getElementById('addPageModal');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const cancelAddPageBtn = document.getElementById('cancelAddPageBtn');
-        const confirmAddPageBtn = document.getElementById('confirmAddPageBtn');
-        const pageNameInput = document.getElementById('pageName');
-        const pageTypeSelect = document.getElementById('pageType');
-        const codeEditor = document.getElementById('codeEditor');
-        const previewFrame = document.getElementById('previewFrame');
-        const languageSelector = document.getElementById('languageSelector');
-        const saveBtn = document.getElementById('saveBtn');
+        const elements = {
+            fileList: document.getElementById('file-list'),
+            codeEditor: document.getElementById('code-editor'),
+            filenameDisplay: document.getElementById('filename-display'),
+            outputPreview: document.getElementById('output-preview'),
+            consoleOutput: document.getElementById('console-output'),
+            runCodeBtn: document.getElementById('run-code-btn'),
+            addFileBtn: document.getElementById('add-file-btn'),
+            newFileBtn: document.getElementById('new-file-btn'),
+            addFileModal: document.getElementById('add-file-modal'),
+            newFilename: document.getElementById('new-filename'),
+            fileType: document.getElementById('file-type'),
+            cancelAddFile: document.getElementById('cancel-add-file'),
+            confirmAddFile: document.getElementById('confirm-add-file'),
+            closeModal: document.querySelector('.close-modal'),
+            splitter: document.getElementById('splitter'),
+            previewSection: document.getElementById('preview-section')
+        };
 
-        // State
-        let files = {};
-        let currentFile = null;
-
-        // Initialize the app
+        // Initialize the application
         function init() {
-            // Load saved files from localStorage or use defaults
-            const savedFiles = localStorage.getItem('codeTesterFiles');
-            if (savedFiles) {
-                files = JSON.parse(savedFiles);
-            } else {
-                files = JSON.parse(JSON.stringify(defaultFiles));
-            }
-
-            // Render the file list
             renderFileList();
-
-            // Set up event listeners
-            addPageBtn.addEventListener('click', openAddPageModal);
-            closeModalBtn.addEventListener('click', closeAddPageModal);
-            cancelAddPageBtn.addEventListener('click', closeAddPageModal);
-            confirmAddPageBtn.addEventListener('click', addNewPage);
-            saveBtn.addEventListener('click', saveCurrentFile);
-            languageSelector.addEventListener('change', updateEditorMode);
-
-            // Open the first file by default
-            if (Object.keys(files).length > 0) {
-                const firstFile = Object.keys(files)[0];
-                openFile(firstFile);
-            }
+            setupEventListeners();
+            setupSplitter();
         }
 
-        // Render the file list in the sidebar
+        // Render the file list
         function renderFileList() {
-            navLinks.innerHTML = '';
+            elements.fileList.innerHTML = '';
             
-            Object.keys(files).forEach(fileName => {
-                const file = files[fileName];
-                const navItem = document.createElement('div');
-                navItem.className = `nav-item ${currentFile === fileName ? 'active' : ''}`;
-                navItem.innerHTML = `
-                    <span>${fileName}</span>
-                    <button class="delete-page" data-file="${fileName}">×</button>
+            Object.values(state.files).forEach(file => {
+                const fileItem = document.createElement('li');
+                fileItem.className = `file-item ${state.currentFile?.name === file.name ? 'active' : ''}`;
+                fileItem.innerHTML = `
+                    <span>${file.name}</span>
+                    <div class="file-actions">
+                        <button class="file-action" data-action="delete" data-filename="${file.name}">🗑️</button>
+                    </div>
                 `;
-                navItem.addEventListener('click', () => openFile(fileName));
-                navLinks.appendChild(navItem);
-            });
-
-            // Add event listeners to delete buttons
-            document.querySelectorAll('.delete-page').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const fileName = btn.getAttribute('data-file');
-                    deleteFile(fileName);
-                });
+                fileItem.addEventListener('click', () => openFile(file.name));
+                elements.fileList.appendChild(fileItem);
             });
         }
 
-        // Open a file in the editor
-        function openFile(fileName) {
-            if (!files[fileName]) return;
+        // Set up event listeners
+        function setupEventListeners() {
+            // File operations
+            elements.addFileBtn.addEventListener('click', showAddFileModal);
+            elements.newFileBtn.addEventListener('click', showAddFileModal);
+            elements.cancelAddFile.addEventListener('click', hideAddFileModal);
+            elements.closeModal.addEventListener('click', hideAddFileModal);
+            elements.confirmAddFile.addEventListener('click', createNewFile);
             
-            currentFile = fileName;
-            const file = files[fileName];
+            // Code execution
+            elements.runCodeBtn.addEventListener('click', runCode);
             
-            // Update the editor content
-            codeEditor.value = file.content;
+            // Editor changes
+            elements.codeEditor.addEventListener('input', saveCurrentFile);
             
-            // Update the language selector
-            languageSelector.value = file.type;
-            updateEditorMode();
-            
-            // Update the preview if it's an HTML file
-            if (file.type === 'html') {
-                updatePreview();
-            } else {
-                previewFrame.srcdoc = `<pre>${file.content}</pre>`;
-            }
-            
-            // Update the active file in the sidebar
-            renderFileList();
+            // Handle delete file actions
+            document.addEventListener('click', (e) => {
+                if (e.target.dataset.action === 'delete') {
+                    deleteFile(e.target.dataset.filename);
+                }
+            });
         }
 
-        // Update the editor mode based on the selected language
-        function updateEditorMode() {
-            if (!currentFile) return;
+        // Set up the splitter between editor and preview
+        function setupSplitter() {
+            let isDragging = false;
             
-            const language = languageSelector.value;
-            files[currentFile].type = language;
+            elements.splitter.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                document.body.style.cursor = 'col-resize';
+                e.preventDefault();
+            });
             
-            // In a real implementation, you would use CodeMirror or Monaco editor
-            // and set the appropriate mode here. For this simple example, we'll
-            // just update the file type in our state.
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                const containerWidth = document.querySelector('.editor-container').offsetWidth;
+                const newWidth = e.clientX - elements.codeEditor.getBoundingClientRect().left;
+                const newPercentage = (newWidth / containerWidth) * 100;
+                
+                elements.codeEditor.style.width = `calc(${newPercentage}% - 5px)`;
+                elements.previewSection.style.width = `calc(${100 - newPercentage}% - 5px)`;
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                document.body.style.cursor = '';
+            });
         }
 
-        // Update the preview frame
-        function updatePreview() {
-            if (!currentFile || files[currentFile].type !== 'html') return;
-            
-            const htmlContent = files[currentFile].content;
-            const cssContent = files['style.css']?.content || '';
-            const jsContent = files['script.js']?.content || '';
-            
-            const fullHtml = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <style>${cssContent}</style>
-                </head>
-                <body>
-                    ${htmlContent.replace('<script src="script.js"></script>', '')}
-                    <script>${jsContent}</script>
-                </body>
-                </html>
-            `;
-            
-            previewFrame.srcdoc = fullHtml;
+        // Show the add file modal
+        function showAddFileModal() {
+            elements.addFileModal.style.display = 'flex';
+            elements.newFilename.value = '';
+            elements.fileType.value = 'html';
+            elements.newFilename.focus();
         }
 
-        // Open the add page modal
-        function openAddPageModal() {
-            pageNameInput.value = '';
-            pageTypeSelect.value = 'html';
-            addPageModal.style.display = 'flex';
-            pageNameInput.focus();
+        // Hide the add file modal
+        function hideAddFileModal() {
+            elements.addFileModal.style.display = 'none';
         }
 
-        // Close the add page modal
-        function closeAddPageModal() {
-            addPageModal.style.display = 'none';
-        }
-
-        // Add a new page
-        function addNewPage() {
-            const name = pageNameInput.value.trim();
-            const type = pageTypeSelect.value;
+        // Create a new file
+        function createNewFile() {
+            const filename = elements.newFilename.value.trim();
+            const fileType = elements.fileType.value;
             
-            if (!name) {
-                alert('Please enter a page name');
+            if (!filename) {
+                alert('Please enter a filename');
                 return;
             }
             
-            const extension = languageExtensions[type] || '.txt';
-            const fileName = name + extension;
+            // Add extension if not provided
+            let fullFilename = filename.includes('.') ? filename : `${filename}.${fileType}`;
             
-            if (files[fileName]) {
-                alert('A file with this name already exists');
-                return;
-            }
-            
-            // Create a new file with default content based on type
-            let content = '';
-            switch (type) {
+            // Default content based on file type
+            let defaultContent = '';
+            switch (fileType) {
                 case 'html':
-                    content = `<!DOCTYPE html>
+                    defaultContent = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${name}</title>
+    <title>${filename.replace('.html', '')}</title>
 </head>
 <body>
-    <h1>${name}</h1>
+    <!-- Your HTML content here -->
 </body>
 </html>`;
                     break;
                 case 'css':
-                    content = `/* ${name} styles */`;
+                    defaultContent = `/* ${filename} styles */`;
                     break;
-                case 'javascript':
                 case 'js':
-                case 'node':
-                    content = `// ${name} JavaScript`;
+                    defaultContent = `// ${filename} JavaScript\nconsole.log('Hello from ${filename}');`;
                     break;
-                case 'python':
-                    content = `# ${name} Python script`;
+                case 'py':
+                    defaultContent = `# ${filename} Python\nprint("Hello from ${filename}")`;
                     break;
-                default:
-                    content = `// ${name} ${type} file`;
             }
             
-            files[fileName] = {
-                name: fileName,
-                type: type,
-                content: content
+            // Add the new file
+            state.files[fullFilename] = {
+                name: fullFilename,
+                type: fileType,
+                content: defaultContent
             };
             
-            // Save to localStorage
-            localStorage.setItem('codeTesterFiles', JSON.stringify(files));
-            
-            // Close the modal and open the new file
-            closeAddPageModal();
-            openFile(fileName);
+            // Refresh the file list and open the new file
+            renderFileList();
+            openFile(fullFilename);
+            hideAddFileModal();
         }
 
         // Delete a file
-        function deleteFile(fileName) {
-            if (Object.keys(files).length <= 1) {
-                alert('You must have at least one file');
-                return;
-            }
-            
-            if (!confirm(`Are you sure you want to delete ${fileName}?`)) {
-                return;
-            }
-            
-            delete files[fileName];
-            localStorage.setItem('codeTesterFiles', JSON.stringify(files));
-            
-            // If we deleted the current file, open another one
-            if (currentFile === fileName) {
-                const remainingFiles = Object.keys(files);
-                openFile(remainingFiles[0]);
-            } else {
+        function deleteFile(filename) {
+            if (confirm(`Are you sure you want to delete ${filename}?`)) {
+                delete state.files[filename];
+                
+                // If we're deleting the current file, clear the editor
+                if (state.currentFile?.name === filename) {
+                    state.currentFile = null;
+                    elements.codeEditor.value = '';
+                    elements.filenameDisplay.textContent = 'No file selected';
+                    elements.outputPreview.innerHTML = '';
+                    elements.consoleOutput.textContent = '';
+                }
+                
                 renderFileList();
             }
         }
 
-        // Save the current file
-        function saveCurrentFile() {
-            if (!currentFile) return;
+        // Open a file in the editor
+        function openFile(filename) {
+            const file = state.files[filename];
+            if (!file) return;
             
-            files[currentFile].content = codeEditor.value;
-            localStorage.setItem('codeTesterFiles', JSON.stringify(files));
+            state.currentFile = file;
+            elements.codeEditor.value = file.content;
+            elements.filenameDisplay.textContent = file.name;
             
-            // Update preview if this is an HTML file
-            if (files[currentFile].type === 'html') {
-                updatePreview();
-            }
+            // Highlight the active file in the file list
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.textContent.includes(filename)) {
+                    item.classList.add('active');
+                }
+            });
             
-            // Show a temporary message
-            const originalText = saveBtn.textContent;
-            saveBtn.textContent = 'Saved!';
-            setTimeout(() => {
-                saveBtn.textContent = originalText;
-            }, 2000);
+            // Clear previous output
+            elements.outputPreview.innerHTML = '';
+            elements.consoleOutput.textContent = '';
         }
 
-        // Initialize the app when the DOM is loaded
-        document.addEventListener('DOMContentLoaded', init);
-
-        // Handle editor changes
-        codeEditor.addEventListener('input', () => {
-            if (currentFile) {
-                files[currentFile].content = codeEditor.value;
-                
-                // Auto-update preview for HTML files
-                if (files[currentFile].type === 'html') {
-                    updatePreview();
-                }
+        // Save changes to the current file
+        function saveCurrentFile() {
+            if (state.currentFile) {
+                state.currentFile.content = elements.codeEditor.value;
             }
+        }
+
+        // Run the current code
+        function runCode() {
+            if (!state.currentFile) {
+                alert('No file selected');
+                return;
+            }
+            
+            saveCurrentFile();
+            elements.consoleOutput.textContent = '';
+            
+            // Capture console.log output
+            const originalConsoleLog = console.log;
+            let consoleOutput = '';
+            
+            console.log = function(message) {
+                if (typeof message === 'object') {
+                    consoleOutput += JSON.stringify(message) + '\n';
+                } else {
+                    consoleOutput += message + '\n';
+                }
+                originalConsoleLog.apply(console, arguments);
+            };
+            
+            try {
+                switch (state.currentFile.type) {
+                    case 'html':
+                        elements.outputPreview.innerHTML = state.currentFile.content;
+                        break;
+                        
+                    case 'css':
+                        elements.outputPreview.innerHTML = `
+                            <style>${state.currentFile.content}</style>
+                            <div class="css-preview-box">
+                                <h1>CSS Preview</h1>
+                                <p>This is a preview of your CSS styles.</p>
+                                <button class="sample-btn">Sample Button</button>
+                                <div class="sample-box" style="width: 100px; height: 100px; margin: 10px 0;"></div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'js':
+                        // Clear previous output
+                        elements.outputPreview.innerHTML = '<div class="js-output"></div>';
+                        
+                        // Execute the JavaScript code
+                        const result = eval(state.currentFile.content);
+                        
+                        // Display the return value (if any)
+                        if (result !== undefined) {
+                            elements.outputPreview.innerHTML += `<div class="return-value"><strong>Return Value:</strong> ${JSON.stringify(result)}</div>`;
+                        }
+                        break;
+                        
+                    case 'py':
+                        // Execute Python code using Brython
+                        brython(1, () => {
+                            try {
+                                const output = [];
+                                const originalPrint = __BRYTHON__.builtins.print;
+                                
+                                __BRYTHON__.builtins.print = function() {
+                                    const args = Array.from(arguments).map(arg => 
+                                        typeof arg === 'object' ? JSON.stringify(arg) : arg
+                                    );
+                                    output.push(args.join(' '));
+                                    originalPrint.apply(this, arguments);
+                                };
+                                
+                                __BRYTHON__.run_python(state.currentFile.content, 'exec');
+                                elements.outputPreview.innerHTML = `<pre>${output.join('\n')}</pre>`;
+                                
+                                // Restore original print
+                                __BRYTHON__.builtins.print = originalPrint;
+                            } catch (error) {
+                                elements.outputPreview.innerHTML = `<div class="error">Python Error: ${error}</div>`;
+                            }
+                        });
+                        break;
+                }
+            } catch (error) {
+                elements.outputPreview.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+            
+            // Display console output
+            if (consoleOutput) {
+                elements.consoleOutput.textContent = consoleOutput;
+            }
+            
+            // Restore original console.log
+            console.log = originalConsoleLog;
+        }
+
+        // Initialize Brython Python runtime
+        function setupBrython() {
+            if (typeof __BRYTHON__ === 'undefined') return;
+            
+            // Add a run_python function to the global scope
+            __BRYTHON__.run_python = function(src, mode) {
+                try {
+                    return __BRYTHON__.$py_src_to_js(src, mode);
+                } catch (err) {
+                    throw err;
+                }
+            };
+        }
+
+        // Start the application
+        window.addEventListener('load', () => {
+            init();
+            setupBrython();
+            // Open index.html by default
+            openFile('index.html');
         });
     </script>
 </body>
