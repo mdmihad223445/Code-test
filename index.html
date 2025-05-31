@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All-in-One Code Tester</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.10.5/brython.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.10.5/brython_stdlib.min.js"></script>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* File Explorer */
+        .file-explorer {
+            width: 250px;
+            background-color: #34495e;
+            color: white;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .file-explorer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .add-file-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .file-list {
+            list-style: none;
+        }
+
+        .file-item {
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 0.3rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .file-item:hover {
+            background-color: #3d566e;
+        }
+
+        .file-item.active {
+            background-color: #2980b9;
+        }
+
+        .file-actions {
+            display: none;
+        }
+
+        .file-item:hover .file-actions {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .file-action {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Editor Section */
+        .editor-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .editor-toolbar {
+            background-color: #ecf0f1;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .filename-display {
+            font-weight: bold;
+        }
+
+        .run-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .editor-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .code-editor {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            resize: none;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            background-color: #f8f9fa;
+            outline: none;
+        }
+
+        /* Preview Section */
+        .preview-section {
+            flex: 1;
+            padding: 1rem;
+            overflow: auto;
+            background-color: white;
+            border-left: 1px solid #ddd;
+        }
+
+        .preview-title {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #7f8c8d;
+        }
+
+        /* Splitter */
+        .splitter {
+            width: 5px;
+            background-color: #ddd;
+            cursor: col-resize;
+        }
+
+        /* Add File Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        /* Console Output */
+        #console-output {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 0.5rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body onload="brython()">
+    <header>
+        <div class="logo">Code Tester</div>
+        <div>
+            <button id="new-file-btn" class="run-btn">+ New File</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="file-explorer">
+            <div class="file-explorer-header">
+                <h3>Files</h3>
+                <button class="add-file-btn" id="add-file-btn">+</button>
+            </div>
+            <ul class="file-list" id="file-list">
+                <!-- Files will be added here dynamically -->
+            </ul>
+        </div>
+
+        <div class="editor-section">
+            <div class="editor-toolbar">
+                <div class="filename-display" id="filename-display">No file selected</div>
+                <button class="run-btn" id="run-code-btn">Run Code</button>
+            </div>
+            <div class="editor-container">
+                <textarea id="code-editor" class="code-editor" placeholder="Select or create a file to start coding..."></textarea>
+                <div class="splitter" id="splitter"></div>
+                <div class="preview-section" id="preview-section">
+                    <div class="preview-title">Output Preview</div>
+                    <div id="output-preview"></div>
+                    <div id="console-output"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add File Modal -->
+    <div class="modal" id="add-file-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New File</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="new-filename">File Name</label>
+                <input type="text" id="new-filename" placeholder="e.g., index.html">
+            </div>
+            <div class="form-group">
+                <label for="file-type">File Type</label>
+                <select id="file-type">
+                    <option value="html">HTML</option>
+                    <option value="css">CSS</option>
+                    <option value="js">JavaScript</option>
+                    <option value="py">Python</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-add-file">Cancel</button>
+                <button class="btn btn-primary" id="confirm-add-file">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // File system and application state
+        const state = {
+            files: {
+                'index.html': {
+                    name: 'index.html',
+                    type: 'html',
+                    content: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Page</title>
+</head>
+<body>
+    <h1>Hello World!</h1>
+    <p>Welcome to my page.</p>
+</body>
+</html>`
+                },
+                'style.css': {
+                    name: 'style.css',
+                    type: 'css',
+                    content: `body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    color: #333;
+}`
+                },
+                'script.js': {
+                    name: 'script.js',
+                    type: 'js',
+                    content: `console.log('Hello from JavaScript!');
+
+function greet(name) {
+    return 'Hello, ' + name + '!';
+}
+
+// Try calling the function
+console.log(greet('World'));`
+                },
+                'main.py': {
+                    name: 'main.py',
+                    type: 'py',
+                    content: `print("Hello from Python!")
+
+def factorial(n):
+    if n == 0:
+        return 1
+    else:
+        return n * factorial(n-1)
+
+# Test the function
+print(factorial(5))`
+                }
+            },
+            currentFile: null
+        };
+
+        // DOM elements
+        const elements = {
+            fileList: document.getElementById('file-list'),
+            codeEditor: document.getElementById('code-editor'),
+            filenameDisplay: document.getElementById('filename-display'),
+            outputPreview: document.getElementById('output-preview'),
+            consoleOutput: document.getElementById('console-output'),
+            runCodeBtn: document.getElementById('run-code-btn'),
+            addFileBtn: document.getElementById('add-file-btn'),
+            newFileBtn: document.getElementById('new-file-btn'),
+            addFileModal: document.getElementById('add-file-modal'),
+            newFilename: document.getElementById('new-filename'),
+            fileType: document.getElementById('file-type'),
+            cancelAddFile: document.getElementById('cancel-add-file'),
+            confirmAddFile: document.getElementById('confirm-add-file'),
+            closeModal: document.querySelector('.close-modal'),
+            splitter: document.getElementById('splitter'),
+            previewSection: document.getElementById('preview-section')
+        };
+
+        // Initialize the application
+        function init() {
+            renderFileList();
+            setupEventListeners();
+            setupSplitter();
+        }
+
+        // Render the file list
+        function renderFileList() {
+            elements.fileList.innerHTML = '';
+            
+            Object.values(state.files).forEach(file => {
+                const fileItem = document.createElement('li');
+                fileItem.className = `file-item ${state.currentFile?.name === file.name ? 'active' : ''}`;
+                fileItem.innerHTML = `
+                    <span>${file.name}</span>
+                    <div class="file-actions">
+                        <button class="file-action" data-action="delete" data-filename="${file.name}">🗑️</button>
+                    </div>
+                `;
+                fileItem.addEventListener('click', () => openFile(file.name));
+                elements.fileList.appendChild(fileItem);
+            });
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // File operations
+            elements.addFileBtn.addEventListener('click', showAddFileModal);
+            elements.newFileBtn.addEventListener('click', showAddFileModal);
+            elements.cancelAddFile.addEventListener('click', hideAddFileModal);
+            elements.closeModal.addEventListener('click', hideAddFileModal);
+            elements.confirmAddFile.addEventListener('click', createNewFile);
+            
+            // Code execution
+            elements.runCodeBtn.addEventListener('click', runCode);
+            
+            // Editor changes
+            elements.codeEditor.addEventListener('input', saveCurrentFile);
+            
+            // Handle delete file actions
+            document.addEventListener('click', (e) => {
+                if (e.target.dataset.action === 'delete') {
+                    deleteFile(e.target.dataset.filename);
+                }
+            });
+        }
+
+        // Set up the splitter between editor and preview
+        function setupSplitter() {
+            let isDragging = false;
+            
+            elements.splitter.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                document.body.style.cursor = 'col-resize';
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                const containerWidth = document.querySelector('.editor-container').offsetWidth;
+                const newWidth = e.clientX - elements.codeEditor.getBoundingClientRect().left;
+                const newPercentage = (newWidth / containerWidth) * 100;
+                
+                elements.codeEditor.style.width = `calc(${newPercentage}% - 5px)`;
+                elements.previewSection.style.width = `calc(${100 - newPercentage}% - 5px)`;
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                document.body.style.cursor = '';
+            });
+        }
+
+        // Show the add file modal
+        function showAddFileModal() {
+            elements.addFileModal.style.display = 'flex';
+            elements.newFilename.value = '';
+            elements.fileType.value = 'html';
+            elements.newFilename.focus();
+        }
+
+        // Hide the add file modal
+        function hideAddFileModal() {
+            elements.addFileModal.style.display = 'none';
+        }
+
+        // Create a new file
+        function createNewFile() {
+            const filename = elements.newFilename.value.trim();
+            const fileType = elements.fileType.value;
+            
+            if (!filename) {
+                alert('Please enter a filename');
+                return;
+            }
+            
+            // Add extension if not provided
+            let fullFilename = filename.includes('.') ? filename : `${filename}.${fileType}`;
+            
+            // Default content based on file type
+            let defaultContent = '';
+            switch (fileType) {
+                case 'html':
+                    defaultContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${filename.replace('.html', '')}</title>
+</head>
+<body>
+    <!-- Your HTML content here -->
+</body>
+</html>`;
+                    break;
+                case 'css':
+                    defaultContent = `/* ${filename} styles */`;
+                    break;
+                case 'js':
+                    defaultContent = `// ${filename} JavaScript\nconsole.log('Hello from ${filename}');`;
+                    break;
+                case 'py':
+                    defaultContent = `# ${filename} Python\nprint("Hello from ${filename}")`;
+                    break;
+            }
+            
+            // Add the new file
+            state.files[fullFilename] = {
+                name: fullFilename,
+                type: fileType,
+                content: defaultContent
+            };
+            
+            // Refresh the file list and open the new file
+            renderFileList();
+            openFile(fullFilename);
+            hideAddFileModal();
+        }
+
+        // Delete a file
+        function deleteFile(filename) {
+            if (confirm(`Are you sure you want to delete ${filename}?`)) {
+                delete state.files[filename];
+                
+                // If we're deleting the current file, clear the editor
+                if (state.currentFile?.name === filename) {
+                    state.currentFile = null;
+                    elements.codeEditor.value = '';
+                    elements.filenameDisplay.textContent = 'No file selected';
+                    elements.outputPreview.innerHTML = '';
+                    elements.consoleOutput.textContent = '';
+                }
+                
+                renderFileList();
+            }
+        }
+
+        // Open a file in the editor
+        function openFile(filename) {
+            const file = state.files[filename];
+            if (!file) return;
+            
+            state.currentFile = file;
+            elements.codeEditor.value = file.content;
+            elements.filenameDisplay.textContent = file.name;
+            
+            // Highlight the active file in the file list
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.textContent.includes(filename)) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Clear previous output
+            elements.outputPreview.innerHTML = '';
+            elements.consoleOutput.textContent = '';
+        }
+
+        // Save changes to the current file
+        function saveCurrentFile() {
+            if (state.currentFile) {
+                state.currentFile.content = elements.codeEditor.value;
+            }
+        }
+
+        // Run the current code
+        function runCode() {
+            if (!state.currentFile) {
+                alert('No file selected');
+                return;
+            }
+            
+            saveCurrentFile();
+            elements.consoleOutput.textContent = '';
+            
+            // Capture console.log output
+            const originalConsoleLog = console.log;
+            let consoleOutput = '';
+            
+            console.log = function(message) {
+                if (typeof message === 'object') {
+                    consoleOutput += JSON.stringify(message) + '\n';
+                } else {
+                    consoleOutput += message + '\n';
+                }
+                originalConsoleLog.apply(console, arguments);
+            };
+            
+            try {
+                switch (state.currentFile.type) {
+                    case 'html':
+                        elements.outputPreview.innerHTML = state.currentFile.content;
+                        break;
+                        
+                    case 'css':
+                        elements.outputPreview.innerHTML = `
+                            <style>${state.currentFile.content}</style>
+                            <div class="css-preview-box">
+                                <h1>CSS Preview</h1>
+                                <p>This is a preview of your CSS styles.</p>
+                                <button class="sample-btn">Sample Button</button>
+                                <div class="sample-box" style="width: 100px; height: 100px; margin: 10px 0;"></div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'js':
+                        // Clear previous output
+                        elements.outputPreview.innerHTML = '<div class="js-output"></div>';
+                        
+                        // Execute the JavaScript code
+                        const result = eval(state.currentFile.content);
+                        
+                        // Display the return value (if any)
+                        if (result !== undefined) {
+                            elements.outputPreview.innerHTML += `<div class="return-value"><strong>Return Value:</strong> ${JSON.stringify(result)}</div>`;
+                        }
+                        break;
+                        
+                    case 'py':
+                        // Execute Python code using Brython
+                        brython(1, () => {
+                            try {
+                                const output = [];
+                                const originalPrint = __BRYTHON__.builtins.print;
+                                
+                                __BRYTHON__.builtins.print = function() {
+                                    const args = Array.from(arguments).map(arg => 
+                                        typeof arg === 'object' ? JSON.stringify(arg) : arg
+                                    );
+                                    output.push(args.join(' '));
+                                    originalPrint.apply(this, arguments);
+                                };
+                                
+                                __BRYTHON__.run_python(state.currentFile.content, 'exec');
+                                elements.outputPreview.innerHTML = `<pre>${output.join('\n')}</pre>`;
+                                
+                                // Restore original print
+                                __BRYTHON__.builtins.print = originalPrint;
+                            } catch (error) {
+                                elements.outputPreview.innerHTML = `<div class="error">Python Error: ${error}</div>`;
+                            }
+                        });
+                        break;
+                }
+            } catch (error) {
+                elements.outputPreview.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+            
+            // Display console output
+            if (consoleOutput) {
+                elements.consoleOutput.textContent = consoleOutput;
+            }
+            
+            // Restore original console.log
+            console.log = originalConsoleLog;
+        }
+
+        // Initialize Brython Python runtime
+        function setupBrython() {
+            if (typeof __BRYTHON__ === 'undefined') return;
+            
+            // Add a run_python function to the global scope
+            __BRYTHON__.run_python = function(src, mode) {
+                try {
+                    return __BRYTHON__.$py_src_to_js(src, mode);
+                } catch (err) {
+                    throw err;
+                }
+            };
+        }
+
+        // Start the application
+        window.addEventListener('load', () => {
+            init();
+            setupBrython();
+            // Open index.html by default
+            openFile('index.html');
+        });
+    </script>
+</body>
+</html>
