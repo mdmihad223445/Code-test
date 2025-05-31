@@ -3,1491 +3,696 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodePlay - Multi-Language Playground</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.10.5/brython.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.10.5/brython_stdlib.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Multi-Language Code Tester</title>
     <style>
         :root {
-            --primary: #7c3aed;
-            --primary-dark: #6d28d9;
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --gray: #94a3b8;
-            --dark-gray: #334155;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --dark-color: #0a1128;
+            --light-color: #f5f5f5;
+            --success-color: #4caf50;
+            --danger-color: #f44336;
         }
-
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--dark);
-            color: var(--light);
-            height: 100vh;
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+        
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: var(--dark-color);
+            color: white;
+            padding: 20px 0;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            height: 100vh;
+            position: fixed;
         }
-
-        /* Header Styles */
-        header {
-            background-color: rgba(15, 23, 42, 0.95);
-            padding: 0.75rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-            z-index: 100;
-        }
-
+        
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-weight: 700;
-            font-size: 1.25rem;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
         }
-
-        .logo-icon {
-            color: var(--primary);
+        
+        .logo h1 {
             font-size: 1.5rem;
         }
-
-        .header-actions {
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-        }
-
-        .btn {
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            color: var(--gray);
-            border: 1px solid var(--gray);
-        }
-
-        .btn-outline:hover {
-            border-color: var(--light);
-            color: var(--light);
-        }
-
-        .btn-icon {
-            padding: 0.5rem;
-            border-radius: 50%;
-            width: 2.25rem;
-            height: 2.25rem;
-            justify-content: center;
-        }
-
-        /* Main Layout */
-        .main-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            width: 280px;
-            background-color: rgba(15, 23, 42, 0.95);
-            border-right: 1px solid rgba(148, 163, 184, 0.2);
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease;
-            z-index: 90;
-        }
-
-        .sidebar-header {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sidebar-title {
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--gray);
-        }
-
-        .file-list {
-            flex: 1;
+        
+        .nav-links {
+            flex-grow: 1;
             overflow-y: auto;
-            padding: 0.5rem;
         }
-
-        .file-item {
-            padding: 0.75rem;
-            border-radius: 0.375rem;
+        
+        .nav-item {
+            padding: 10px 20px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.25rem;
-            position: relative;
-            transition: all 0.2s;
-        }
-
-        .file-item:hover {
-            background-color: rgba(148, 163, 184, 0.1);
-        }
-
-        .file-item.active {
-            background-color: rgba(124, 58, 237, 0.2);
-            color: var(--primary);
-        }
-
-        .file-icon {
-            font-size: 1.25rem;
-            flex-shrink: 0;
-        }
-
-        .file-name {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: 0.9375rem;
-        }
-
-        .file-actions {
-            display: none;
-            position: absolute;
-            right: 0.75rem;
-            background-color: var(--dark);
-            border-radius: 0.25rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .file-item:hover .file-actions {
-            display: flex;
-        }
-
-        .file-action {
-            padding: 0.375rem;
-            color: var(--gray);
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .file-action:hover {
-            color: var(--danger);
-        }
-
-        /* Editor Area */
-        .editor-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .editor-tabs {
-            display: flex;
-            background-color: rgba(15, 23, 42, 0.9);
-            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-            overflow-x: auto;
-        }
-
-        .editor-tab {
-            padding: 0.75rem 1.25rem;
-            font-size: 0.875rem;
-            cursor: pointer;
-            border-right: 1px solid rgba(148, 163, 184, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            min-width: 160px;
-            transition: all 0.2s;
-        }
-
-        .editor-tab.active {
-            background-color: rgba(30, 41, 59, 0.9);
-            color: var(--primary);
-            border-bottom: 2px solid var(--primary);
-        }
-
-        .editor-tab-close {
-            margin-left: auto;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .editor-tab:hover .editor-tab-close {
-            opacity: 1;
-        }
-
-        .editor-container {
-            flex: 1;
-            display: flex;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .code-editor {
-            flex: 1;
-            padding: 1rem;
-            background-color: rgba(15, 23, 42, 0.9);
-            color: var(--light);
-            font-family: 'Fira Code', monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            border: none;
-            resize: none;
-            outline: none;
-            tab-size: 2;
-        }
-
-        .preview-container {
-            flex: 1;
-            padding: 1rem;
-            overflow: auto;
-            background-color: white;
-            color: #1e293b;
-        }
-
-        .preview-header {
+            transition: background-color 0.3s;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #e2e8f0;
         }
-
-        .preview-title {
-            font-weight: 600;
-            color: #1e293b;
+        
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
-
-        .preview-actions {
-            display: flex;
-            gap: 0.5rem;
+        
+        .nav-item.active {
+            background-color: var(--primary-color);
         }
-
-        /* Splitter */
-        .splitter {
-            width: 8px;
-            background-color: rgba(30, 41, 59, 0.9);
-            cursor: col-resize;
-            position: relative;
-            transition: background-color 0.2s;
-        }
-
-        .splitter:hover {
-            background-color: var(--primary);
-        }
-
-        .splitter::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 1px;
-            right: 1px;
-            height: 30px;
-            background-color: var(--gray);
-            border-radius: 3px;
-            transform: translateY(-50%);
-        }
-
-        /* Console */
-        .console {
-            height: 180px;
-            background-color: #0f172a;
-            border-top: 1px solid rgba(148, 163, 184, 0.2);
-            overflow: auto;
-            padding: 0.75rem;
-            font-family: 'Fira Code', monospace;
-            font-size: 13px;
-        }
-
-        .console-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .console-title {
-            font-size: 0.8125rem;
-            color: var(--gray);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .console-clear {
-            color: var(--gray);
-            cursor: pointer;
-            font-size: 0.8125rem;
-            transition: color 0.2s;
-        }
-
-        .console-clear:hover {
-            color: var(--light);
-        }
-
-        .console-content {
-            white-space: pre-wrap;
-        }
-
-        .log-message {
-            margin-bottom: 0.25rem;
-        }
-
-        .log-error {
-            color: var(--danger);
-        }
-
-        /* Mobile Styles */
-        @media (max-width: 768px) {
-            .sidebar {
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                transform: translateX(-100%);
-                width: 280px;
-                z-index: 95;
-            }
-
-            .sidebar.active {
-                transform: translateX(0);
-                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.3);
-            }
-
-            .editor-tabs {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .editor-tab {
-                min-width: 140px;
-                padding: 0.75rem 1rem;
-            }
-
-            .preview-container {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                z-index: 15;
-                display: none;
-            }
-
-            .preview-container.active {
-                display: block;
-            }
-
-            .mobile-toolbar {
-                display: flex;
-                padding: 0.5rem;
-                background-color: rgba(30, 41, 59, 0.9);
-                border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-            }
-
-            .mobile-view-toggle {
-                display: flex;
-                gap: 0.5rem;
-                margin-left: auto;
-            }
-
-            .view-btn {
-                padding: 0.375rem 0.75rem;
-                background-color: transparent;
-                border: 1px solid var(--gray);
-                border-radius: 0.25rem;
-                color: var(--gray);
-                cursor: pointer;
-                font-size: 0.8125rem;
-                transition: all 0.2s;
-            }
-
-            .view-btn.active {
-                background-color: var(--primary);
-                border-color: var(--primary);
-                color: white;
-            }
-        }
-
-        /* Toggle Sidebar Button */
-        .toggle-sidebar {
-            display: none;
+        
+        .delete-page {
+            color: var(--danger-color);
             background: none;
             border: none;
-            color: var(--gray);
             cursor: pointer;
-            font-size: 1.25rem;
-            transition: color 0.2s;
+            font-size: 0.9rem;
+            padding: 2px 5px;
+            border-radius: 3px;
         }
-
-        .toggle-sidebar:hover {
-            color: var(--light);
+        
+        .delete-page:hover {
+            background-color: rgba(244, 67, 54, 0.2);
         }
-
-        @media (max-width: 768px) {
-            .toggle-sidebar {
-                display: block;
-            }
+        
+        .add-page {
+            padding: 15px 20px;
+            margin-top: auto;
         }
-
-        /* Loading Indicator */
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Tooltip */
-        .tooltip {
-            position: relative;
-        }
-
-        .tooltip::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--dark);
+        
+        .add-page-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--primary-color);
             color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-        }
-
-        .tooltip:hover::after {
-            opacity: 1;
-        }
-
-        /* Notification */
-        .notification {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            background-color: var(--success);
-            color: white;
-            padding: 0.75rem 1.25rem;
-            border-radius: 0.375rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .notification.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        /* Icons */
-        .icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Login User Info */
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
             font-weight: bold;
+            transition: background-color 0.3s;
         }
-
-        .username {
-            font-size: 0.875rem;
+        
+        .add-page-btn:hover {
+            background-color: var(--secondary-color);
         }
-
-        /* Welcome Screen */
-        .welcome-screen {
+        
+        /* Main content styles */
+        .main-content {
+            flex-grow: 1;
+            margin-left: 250px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            padding: 2rem;
-            text-align: center;
-            background-color: rgba(15, 23, 42, 0.8);
+            height: 100vh;
         }
-
-        .welcome-title {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .welcome-subtitle {
-            color: var(--gray);
-            margin-bottom: 2rem;
-            max-width: 600px;
-        }
-
-        .welcome-actions {
+        
+        .toolbar {
+            padding: 15px 20px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             display: flex;
-            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
         }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        
+        .language-selector {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
         }
-
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
+        
+        .save-btn {
+            padding: 8px 15px;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .save-btn:hover {
+            background-color: #3d8b40;
+        }
+        
+        .editor-container {
+            flex-grow: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .code-editor {
+            flex-grow: 1;
+            border: none;
+            resize: none;
+            padding: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            background-color: #f8f8f8;
+            border-right: 1px solid #ddd;
+        }
+        
+        .preview-container {
+            flex-basis: 50%;
+            overflow: auto;
+            padding: 20px;
+            background-color: white;
+        }
+        
+        .preview-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: white;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            max-width: 90%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.3rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+        
+        .btn-secondary {
+            background-color: #ddd;
+            border: none;
         }
     </style>
 </head>
-<body onload="brython()">
-    <!-- Header -->
-    <header>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
         <div class="logo">
-            <span class="logo-icon icon">💻</span>
-            <span>CodePlay</span>
+            <h1>Code Tester</h1>
         </div>
-        <div class="header-actions">
-            <div id="user-info" class="user-info" style="display: none;">
-                <div class="user-avatar" id="user-avatar">U</div>
-                <span class="username" id="username">User</span>
-            </div>
-            <button id="login-btn" class="btn btn-outline">
-                <span class="icon">👤</span>
-                <span>Login</span>
-            </button>
-            <button id="run-btn" class="btn btn-primary">
-                <span class="icon">▶️</span>
-                <span>Run</span>
-            </button>
-            <button class="toggle-sidebar" id="toggle-sidebar">☰</button>
+        <div class="nav-links" id="navLinks">
+            <!-- Pages will be added here dynamically -->
         </div>
-    </header>
+        <div class="add-page">
+            <button class="add-page-btn" id="addPageBtn">+ Add Page</button>
+        </div>
+    </div>
 
     <!-- Main Content -->
-    <div class="main-container">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-title">Explorer</div>
-                <button id="new-file-btn" class="btn-icon tooltip" data-tooltip="New File">
-                    <span class="icon">+</span>
-                </button>
+    <div class="main-content">
+        <div class="toolbar">
+            <div>
+                <select class="language-selector" id="languageSelector">
+                    <option value="html">HTML</option>
+                    <option value="css">CSS</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                    <option value="csharp">C#</option>
+                    <option value="cpp">C++</option>
+                    <option value="php">PHP</option>
+                    <option value="ruby">Ruby</option>
+                    <option value="swift">Swift</option>
+                    <option value="typescript">TypeScript</option>
+                    <option value="nodejs">Node.js</option>
+                </select>
             </div>
-            <div class="file-list" id="file-list">
-                <!-- Files will be added here dynamically -->
+            <div>
+                <button class="save-btn" id="saveBtn">Save</button>
             </div>
         </div>
-
-        <!-- Editor Area -->
-        <div class="editor-area">
-            <div class="editor-tabs" id="editor-tabs">
-                <!-- Tabs will be added here dynamically -->
-            </div>
-            <div class="mobile-toolbar">
-                <div class="mobile-view-toggle">
-                    <button class="view-btn active" data-view="editor">Editor</button>
-                    <button class="view-btn" data-view="preview">Preview</button>
-                </div>
-            </div>
-            <div class="editor-container">
-                <textarea id="code-editor" class="code-editor" spellcheck="false"></textarea>
-                <div class="splitter" id="splitter"></div>
-                <div class="preview-container" id="preview-container">
-                    <div class="preview-header">
-                        <div class="preview-title">Output Preview</div>
-                        <div class="preview-actions">
-                            <button id="refresh-preview" class="btn-icon tooltip" data-tooltip="Refresh">
-                                <span class="icon">🔄</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div id="output-preview"></div>
-                </div>
-            </div>
-            <div class="console">
-                <div class="console-header">
-                    <div class="console-title">Console</div>
-                    <button class="console-clear" id="clear-console">Clear</button>
-                </div>
-                <div class="console-content" id="console-output"></div>
+        <div class="editor-container">
+            <textarea class="code-editor" id="codeEditor" spellcheck="false"></textarea>
+            <div class="preview-container">
+                <iframe class="preview-frame" id="previewFrame"></iframe>
             </div>
         </div>
     </div>
 
-    <!-- New File Modal -->
-    <div class="modal" id="new-file-modal">
+    <!-- Add Page Modal -->
+    <div class="modal" id="addPageModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Create New File</div>
-                <button class="modal-close" id="close-new-file-modal">&times;</button>
+                <h2>Add New Page</h2>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="file-name" class="form-label">File Name</label>
-                    <input type="text" id="file-name" class="form-input" placeholder="index.html">
-                </div>
-                <div class="form-group">
-                    <label for="file-type" class="form-label">File Type</label>
-                    <select id="file-type" class="form-input form-select">
-                        <option value="html">HTML</option>
-                        <option value="css">CSS</option>
-                        <option value="js">JavaScript</option>
-                        <option value="py">Python</option>
-                    </select>
-                </div>
+            <div class="form-group">
+                <label for="pageName">Page Name</label>
+                <input type="text" id="pageName" placeholder="Enter page name (without extension)">
+            </div>
+            <div class="form-group">
+                <label for="pageType">Page Type</label>
+                <select id="pageType">
+                    <option value="html">HTML</option>
+                    <option value="css">CSS</option>
+                    <option value="js">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                    <option value="csharp">C#</option>
+                    <option value="cpp">C++</option>
+                    <option value="php">PHP</option>
+                    <option value="ruby">Ruby</option>
+                    <option value="swift">Swift</option>
+                    <option value="ts">TypeScript</option>
+                    <option value="node">Node.js</option>
+                </select>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-outline" id="cancel-new-file">Cancel</button>
-                <button class="btn btn-primary" id="create-new-file">Create</button>
+                <button class="btn btn-secondary" id="cancelAddPageBtn">Cancel</button>
+                <button class="btn btn-primary" id="confirmAddPageBtn">Add Page</button>
             </div>
         </div>
     </div>
-
-    <!-- Login Modal -->
-    <div class="modal" id="login-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Login to CodePlay</div>
-                <button class="modal-close" id="close-login-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="login-email" class="form-label">Email</label>
-                    <input type="email" id="login-email" class="form-input" placeholder="your@email.com">
-                </div>
-                <div class="form-group">
-                    <label for="login-password" class="form-label">Password</label>
-                    <input type="password" id="login-password" class="form-input" placeholder="••••••••">
-                </div>
-                <div class="form-group" style="margin-top: 1.5rem;">
-                    <button id="google-login" class="btn btn-outline" style="width: 100%; justify-content: center;">
-                        <span class="icon">G</span>
-                        <span>Continue with Google</span>
-                    </button>
-                </div>
-                <div class="form-group">
-                    <button id="github-login" class="btn btn-outline" style="width: 100%; justify-content: center;">
-                        <span class="icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"></path>
-                            </svg>
-                        </span>
-                        <span>Continue with GitHub</span>
-                    </button>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" id="cancel-login">Cancel</button>
-                <button class="btn btn-primary" id="confirm-login">Login</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Notification -->
-    <div class="notification" id="notification"></div>
 
     <script>
-        // Application State
-        const state = {
-            files: {
-                'index.html': {
-                    name: 'index.html',
-                    type: 'html',
-                    content: `<!DOCTYPE html>
+        // Default files
+        const defaultFiles = {
+            'index.html': {
+                name: 'index.html',
+                type: 'html',
+                content: `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Awesome Page</title>
+    <title>My Website</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Welcome to CodePlay!</h1>
-    <p>Edit this code and click "Run" to see the results.</p>
+    <h1>Welcome to My Website</h1>
+    <p>This is the home page of my website.</p>
     <script src="script.js"></script>
 </body>
-</html>`,
-                    active: true
-                },
-                'style.css': {
-                    name: 'style.css',
-                    type: 'css',
-                    content: `body {
-    font-family: 'Poppins', sans-serif;
+</html>`
+            },
+            'style.css': {
+                name: 'style.css',
+                type: 'css',
+                content: `body {
+    font-family: Arial, sans-serif;
     line-height: 1.6;
     margin: 0;
-    padding: 2rem;
-    background-color: #f8fafc;
-    color: #1e293b;
+    padding: 20px;
+    color: #333;
+    background-color: #f4f4f4;
 }
 
 h1 {
-    color: #7c3aed;
-    margin-bottom: 1rem;
-}`,
-                    active: false
-                },
-                'script.js': {
-                    name: 'script.js',
-                    type: 'js',
-                    content: `console.log('Hello from JavaScript!');
-
-// Simple counter
-let count = 0;
-
-function updateCounter() {
-    count++;
-    document.getElementById('counter').textContent = count;
-}
-
-// Create counter element
-const counterElement = document.createElement('div');
-counterElement.id = 'counter';
-counterElement.textContent = '0';
-counterElement.style.fontSize = '2rem';
-counterElement.style.margin = '1rem 0';
-counterElement.style.cursor = 'pointer';
-counterElement.onclick = updateCounter;
-
-document.body.appendChild(counterElement);`,
-                    active: false
-                },
-                'app.py': {
-                    name: 'app.py',
-                    type: 'py',
-                    content: `print("Hello from Python!")
-
-def factorial(n):
-    if n == 0:
-        return 1
-    else:
-        return n * factorial(n-1)
-
-# Calculate factorial of 5
-print(f"Factorial of 5 is: {factorial(5)}")`,
-                    active: false
-                }
+    color: #4a6fa5;
+}`
             },
-            currentFile: 'index.html',
-            user: null,
-            isLoggedIn: false,
-            editorSplit: 50
+            'script.js': {
+                name: 'script.js',
+                type: 'javascript',
+                content: `console.log('Hello from script.js!');
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Your JavaScript code here
+    alert('Welcome to my website!');
+});`
+            }
         };
 
-        // DOM Elements
-        const elements = {
-            sidebar: document.getElementById('sidebar'),
-            fileList: document.getElementById('file-list'),
-            editorTabs: document.getElementById('editor-tabs'),
-            codeEditor: document.getElementById('code-editor'),
-            outputPreview: document.getElementById('output-preview'),
-            consoleOutput: document.getElementById('console-output'),
-            runBtn: document.getElementById('run-btn'),
-            newFileBtn: document.getElementById('new-file-btn'),
-            loginBtn: document.getElementById('login-btn'),
-            toggleSidebar: document.getElementById('toggle-sidebar'),
-            newFileModal: document.getElementById('new-file-modal'),
-            fileName: document.getElementById('file-name'),
-            fileType: document.getElementById('file-type'),
-            createNewFile: document.getElementById('create-new-file'),
-            cancelNewFile: document.getElementById('cancel-new-file'),
-            closeNewFileModal: document.getElementById('close-new-file-modal'),
-            loginModal: document.getElementById('login-modal'),
-            loginEmail: document.getElementById('login-email'),
-            loginPassword: document.getElementById('login-password'),
-            confirmLogin: document.getElementById('confirm-login'),
-            cancelLogin: document.getElementById('cancel-login'),
-            closeLoginModal: document.getElementById('close-login-modal'),
-            googleLogin: document.getElementById('google-login'),
-            githubLogin: document.getElementById('github-login'),
-            splitter: document.getElementById('splitter'),
-            previewContainer: document.getElementById('preview-container'),
-            refreshPreview: document.getElementById('refresh-preview'),
-            clearConsole: document.getElementById('clear-console'),
-            viewToggle: document.querySelectorAll('.view-btn'),
-            notification: document.getElementById('notification'),
-            userInfo: document.getElementById('user-info'),
-            userAvatar: document.getElementById('user-avatar'),
-            username: document.getElementById('username')
+        // Language to file extension mapping
+        const languageExtensions = {
+            'html': '.html',
+            'css': '.css',
+            'javascript': '.js',
+            'python': '.py',
+            'java': '.java',
+            'csharp': '.cs',
+            'cpp': '.cpp',
+            'php': '.php',
+            'ruby': '.rb',
+            'swift': '.swift',
+            'typescript': '.ts',
+            'nodejs': '.js',
+            'js': '.js',
+            'ts': '.ts',
+            'node': '.js'
         };
 
-        // Initialize the application
+        // Language to CodeMirror mode mapping
+        const languageModes = {
+            'html': 'htmlmixed',
+            'css': 'css',
+            'javascript': 'javascript',
+            'python': 'python',
+            'java': 'text/x-java',
+            'csharp': 'text/x-csharp',
+            'cpp': 'text/x-c++src',
+            'php': 'php',
+            'ruby': 'ruby',
+            'swift': 'swift',
+            'typescript': 'text/typescript',
+            'nodejs': 'javascript',
+            'js': 'javascript',
+            'ts': 'text/typescript',
+            'node': 'javascript'
+        };
+
+        // DOM elements
+        const navLinks = document.getElementById('navLinks');
+        const addPageBtn = document.getElementById('addPageBtn');
+        const addPageModal = document.getElementById('addPageModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelAddPageBtn = document.getElementById('cancelAddPageBtn');
+        const confirmAddPageBtn = document.getElementById('confirmAddPageBtn');
+        const pageNameInput = document.getElementById('pageName');
+        const pageTypeSelect = document.getElementById('pageType');
+        const codeEditor = document.getElementById('codeEditor');
+        const previewFrame = document.getElementById('previewFrame');
+        const languageSelector = document.getElementById('languageSelector');
+        const saveBtn = document.getElementById('saveBtn');
+
+        // State
+        let files = {};
+        let currentFile = null;
+
+        // Initialize the app
         function init() {
-            renderFileList();
-            renderEditorTabs();
-            loadFile(state.currentFile);
-            setupEventListeners();
-            restoreState();
-            setupBrython();
-            checkLoginStatus();
-
-            // Set initial split
-            updateEditorSplit();
-
-            // Show welcome message
-            showNotification('Welcome to CodePlay! Start coding now.');
-        }
-
-        // Render file list
-        function renderFileList() {
-            elements.fileList.innerHTML = '';
-            
-            Object.values(state.files).forEach(file => {
-                const fileItem = document.createElement('div');
-                fileItem.className = `file-item ${file.active ? 'active' : ''}`;
-                
-                // Get appropriate icon based on file type
-                let icon;
-                switch(file.type) {
-                    case 'html': icon = '📄'; break;
-                    case 'css': icon = '🎨'; break;
-                    case 'js': icon = '📜'; break;
-                    case 'py': icon = '🐍'; break;
-                    default: icon = '📁';
-                }
-                
-                fileItem.innerHTML = `
-                    <span class="file-icon">${icon}</span>
-                    <span class="file-name">${file.name}</span>
-                    <div class="file-actions">
-                        <span class="file-action" data-action="delete" data-filename="${file.name}">🗑️</span>
-                    </div>
-                `;
-                
-                fileItem.addEventListener('click', () => openFile(file.name));
-                elements.fileList.appendChild(fileItem);
-            });
-        }
-
-        // Render editor tabs
-        function renderEditorTabs() {
-            elements.editorTabs.innerHTML = '';
-            
-            Object.values(state.files).forEach(file => {
-                const tab = document.createElement('div');
-                tab.className = `editor-tab ${file.active ? 'active' : ''}`;
-                
-                // Get appropriate icon based on file type
-                let icon;
-                switch(file.type) {
-                    case 'html': icon = '📄'; break;
-                    case 'css': icon = '🎨'; break;
-                    case 'js': icon = '📜'; break;
-                    case 'py': icon = '🐍'; break;
-                    default: icon = '📁';
-                }
-                
-                tab.innerHTML = `
-                    <span>${icon}</span>
-                    <span>${file.name}</span>
-                    <span class="editor-tab-close" data-filename="${file.name}">×</span>
-                `;
-                
-                tab.addEventListener('click', () => openFile(file.name));
-                elements.editorTabs.appendChild(tab);
-            });
-        }
-
-        // Load file content into editor
-        function loadFile(filename) {
-            if (!state.files[filename]) return;
-            
-            // Mark all files as inactive
-            Object.values(state.files).forEach(file => file.active = false);
-            
-            // Set current file as active
-            state.files[filename].active = true;
-            state.currentFile = filename;
-            elements.codeEditor.value = state.files[filename].content;
-            
-            // Update UI
-            renderFileList();
-            renderEditorTabs();
-        }
-
-        // Open a file
-        function openFile(filename) {
-            saveCurrentFile();
-            loadFile(filename);
-        }
-
-        // Save current file
-        function saveCurrentFile() {
-            if (state.currentFile) {
-                state.files[state.currentFile].content = elements.codeEditor.value;
-                
-                // Save to localStorage if logged in
-                if (state.isLoggedIn) {
-                    saveToLocalStorage();
-                }
-            }
-        }
-
-        // Run the current code
-        function runCode() {
-            saveCurrentFile();
-            clearConsole();
-            
-            if (!state.currentFile) {
-                showNotification('No file selected');
-                return;
-            }
-            
-            const file = state.files[state.currentFile];
-            
-            // Capture console.log output
-            const originalConsoleLog = console.log;
-            const originalConsoleError = console.error;
-            let consoleOutput = '';
-            
-            console.log = function(message) {
-                if (typeof message === 'object') {
-                    consoleOutput += JSON.stringify(message) + '\n';
-                } else {
-                    consoleOutput += message + '\n';
-                }
-                originalConsoleLog.apply(console, arguments);
-            };
-            
-            console.error = function(message) {
-                consoleOutput += `Error: ${message}\n`;
-                originalConsoleError.apply(console, arguments);
-            };
-            
-            try {
-                switch(file.type) {
-                    case 'html':
-                        elements.outputPreview.innerHTML = file.content;
-                        break;
-                        
-                    case 'css':
-                        elements.outputPreview.innerHTML = `
-                            <style>${file.content}</style>
-                            <div class="css-preview">
-                                <h1>CSS Preview</h1>
-                                <p>This is a preview of your CSS styles.</p>
-                                <button class="preview-btn">Sample Button</button>
-                                <div class="preview-box"></div>
-                            </div>
-                        `;
-                        break;
-                        
-                    case 'js':
-                        // Clear previous output
-                        elements.outputPreview.innerHTML = '';
-                        
-                        // Execute the JavaScript code
-                        const result = eval(file.content);
-                        
-                        // Display the return value (if any)
-                        if (result !== undefined) {
-                            logToConsole(`Return value: ${JSON.stringify(result)}`);
-                        }
-                        break;
-                        
-                    case 'py':
-                        // Execute Python code using Brython
-                        if (typeof __BRYTHON__ !== 'undefined') {
-                            try {
-                                const output = [];
-                                const originalPrint = __BRYTHON__.builtins.print;
-                                
-                                __BRYTHON__.builtins.print = function() {
-                                    const args = Array.from(arguments).map(arg => 
-                                        typeof arg === 'object' ? JSON.stringify(arg) : arg
-                                    );
-                                    output.push(args.join(' '));
-                                    originalPrint.apply(this, arguments);
-                                };
-                                
-                                __BRYTHON__.run_python(file.content, 'exec');
-                                elements.outputPreview.innerHTML = `<pre>${output.join('\n')}</pre>`;
-                                
-                                // Restore original print
-                                __BRYTHON__.builtins.print = originalPrint;
-                            } catch (error) {
-                                elements.outputPreview.innerHTML = `<div class="error">Python Error: ${error}</div>`;
-                            }
-                        }
-                        break;
-                }
-            } catch (error) {
-                elements.outputPreview.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-            }
-            
-            // Display console output
-            if (consoleOutput) {
-                logToConsole(consoleOutput);
-            }
-            
-            // Restore original console.log
-            console.log = originalConsoleLog;
-            console.error = originalConsoleError;
-        }
-
-        // Log message to console
-        function logToConsole(message) {
-            const consoleElement = elements.consoleOutput;
-            const lines = message.split('\n');
-            
-            lines.forEach(line => {
-                if (line.trim() === '') return;
-                
-                const isError = line.startsWith('Error:');
-                const logElement = document.createElement('div');
-                logElement.className = `log-message ${isError ? 'log-error' : ''}`;
-                logElement.textContent = line;
-                consoleElement.appendChild(logElement);
-            });
-            
-            // Scroll to bottom
-            consoleElement.scrollTop = consoleElement.scrollHeight;
-        }
-
-        // Clear console
-        function clearConsole() {
-            elements.consoleOutput.innerHTML = '';
-        }
-
-        // Show notification
-        function showNotification(message, type = 'success') {
-            const notification = elements.notification;
-            notification.textContent = message;
-            
-            // Set background color based on type
-            switch(type) {
-                case 'success':
-                    notification.style.backgroundColor = 'var(--success)';
-                    break;
-                case 'error':
-                    notification.style.backgroundColor = 'var(--danger)';
-                    break;
-                case 'warning':
-                    notification.style.backgroundColor = 'var(--warning)';
-                    break;
-                default:
-                    notification.style.backgroundColor = 'var(--primary)';
-            }
-            
-            notification.classList.add('show');
-            
-            // Hide after 3 seconds
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // Save state to localStorage
-        function saveToLocalStorage() {
-            if (state.isLoggedIn) {
-                const data = {
-                    files: state.files,
-                    currentFile: state.currentFile,
-                    editorSplit: state.editorSplit
-                };
-                localStorage.setItem(`codeplay_${state.user.email}`, JSON.stringify(data));
-                showNotification('Changes saved successfully');
-            }
-        }
-
-        // Restore state from localStorage
-        function restoreState() {
-            if (state.isLoggedIn) {
-                const savedData = localStorage.getItem(`codeplay_${state.user.email}`);
-                if (savedData) {
-                    try {
-                        const data = JSON.parse(savedData);
-                        state.files = data.files || state.files;
-                        state.currentFile = data.currentFile || state.currentFile;
-                        state.editorSplit = data.editorSplit || state.editorSplit;
-                        showNotification('Restored your previous session');
-                    } catch (e) {
-                        console.error('Failed to parse saved data:', e);
-                    }
-                }
-            }
-        }
-
-        // Check login status
-        function checkLoginStatus() {
-            const savedUser = localStorage.getItem('codeplay_user');
-            if (savedUser) {
-                try {
-                    state.user = JSON.parse(savedUser);
-                    state.isLoggedIn = true;
-                    updateLoginUI();
-                    restoreState();
-                } catch (e) {
-                    console.error('Failed to parse user data:', e);
-                }
-            }
-        }
-
-        // Update login UI
-        function updateLoginUI() {
-            if (state.isLoggedIn) {
-                elements.loginBtn.style.display = 'none';
-                elements.userInfo.style.display = 'flex';
-                elements.userAvatar.textContent = state.user.name.charAt(0).toUpperCase();
-                elements.username.textContent = state.user.name;
+            // Load saved files from localStorage or use defaults
+            const savedFiles = localStorage.getItem('codeTesterFiles');
+            if (savedFiles) {
+                files = JSON.parse(savedFiles);
             } else {
-                elements.loginBtn.style.display = 'flex';
-                elements.userInfo.style.display = 'none';
+                files = JSON.parse(JSON.stringify(defaultFiles));
+            }
+
+            // Render the file list
+            renderFileList();
+
+            // Set up event listeners
+            addPageBtn.addEventListener('click', openAddPageModal);
+            closeModalBtn.addEventListener('click', closeAddPageModal);
+            cancelAddPageBtn.addEventListener('click', closeAddPageModal);
+            confirmAddPageBtn.addEventListener('click', addNewPage);
+            saveBtn.addEventListener('click', saveCurrentFile);
+            languageSelector.addEventListener('change', updateEditorMode);
+
+            // Open the first file by default
+            if (Object.keys(files).length > 0) {
+                const firstFile = Object.keys(files)[0];
+                openFile(firstFile);
             }
         }
 
-        // Setup Brython
-        function setupBrython() {
-            if (typeof __BRYTHON__ === 'undefined') return;
+        // Render the file list in the sidebar
+        function renderFileList() {
+            navLinks.innerHTML = '';
             
-            // Add a run_python function to the global scope
-            __BRYTHON__.run_python = function(src, mode) {
-                try {
-                    return __BRYTHON__.$py_src_to_js(src, mode);
-                } catch (err) {
-                    throw err;
-                }
-            };
-        }
+            Object.keys(files).forEach(fileName => {
+                const file = files[fileName];
+                const navItem = document.createElement('div');
+                navItem.className = `nav-item ${currentFile === fileName ? 'active' : ''}`;
+                navItem.innerHTML = `
+                    <span>${fileName}</span>
+                    <button class="delete-page" data-file="${fileName}">×</button>
+                `;
+                navItem.addEventListener('click', () => openFile(fileName));
+                navLinks.appendChild(navItem);
+            });
 
-        // Setup event listeners
-        function setupEventListeners() {
-            // File operations
-            elements.newFileBtn.addEventListener('click', showNewFileModal);
-            elements.createNewFile.addEventListener('click', createNewFile);
-            elements.cancelNewFile.addEventListener('click', hideNewFileModal);
-            elements.closeNewFileModal.addEventListener('click', hideNewFileModal);
-            
-            // Login operations
-            elements.loginBtn.addEventListener('click', showLoginModal);
-            elements.confirmLogin.addEventListener('click', handleLogin);
-            elements.cancelLogin.addEventListener('click', hideLoginModal);
-            elements.closeLoginModal.addEventListener('click', hideLoginModal);
-            elements.googleLogin.addEventListener('click', () => handleSocialLogin('google'));
-            elements.githubLogin.addEventListener('click', () => handleSocialLogin('github'));
-            
-            // Code execution
-            elements.runBtn.addEventListener('click', runCode);
-            elements.refreshPreview.addEventListener('click', runCode);
-            elements.clearConsole.addEventListener('click', clearConsole);
-            
-            // Editor changes
-            elements.codeEditor.addEventListener('input', saveCurrentFile);
-            
-            // Handle delete file actions
-            document.addEventListener('click', (e) => {
-                if (e.target.dataset.action === 'delete') {
-                    deleteFile(e.target.dataset.filename);
-                }
-                if (e.target.classList.contains('editor-tab-close')) {
-                    closeTab(e.target.dataset.filename);
-                }
-            });
-            
-            // Splitter
-            let isDragging = false;
-            elements.splitter.addEventListener('mousedown', () => {
-                isDragging = true;
-                document.body.style.cursor = 'col-resize';
-            });
-            
-            document.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                
-                const containerWidth = document.querySelector('.editor-container').offsetWidth;
-                const editorRect = elements.codeEditor.getBoundingClientRect();
-                const newWidth = e.clientX - editorRect.left;
-                const newPercentage = (newWidth / containerWidth) * 100;
-                
-                // Limit between 20% and 80%
-                state.editorSplit = Math.max(20, Math.min(80, newPercentage));
-                updateEditorSplit();
-            });
-            
-            document.addEventListener('mouseup', () => {
-                isDragging = false;
-                document.body.style.cursor = '';
-            });
-            
-            // Mobile view toggle
-            elements.viewToggle.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const view = btn.dataset.view;
-                    elements.viewToggle.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    
-                    if (view === 'editor') {
-                        elements.codeEditor.style.display = 'block';
-                        elements.previewContainer.style.display = 'none';
-                    } else {
-                        elements.codeEditor.style.display = 'none';
-                        elements.previewContainer.style.display = 'block';
-                        runCode();
-                    }
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-page').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const fileName = btn.getAttribute('data-file');
+                    deleteFile(fileName);
                 });
             });
-            
-            // Toggle sidebar on mobile
-            elements.toggleSidebar.addEventListener('click', () => {
-                elements.sidebar.classList.toggle('active');
-            });
-            
-            // Close sidebar when clicking outside on mobile
-            document.addEventListener('click', (e) => {
-                if (window.innerWidth <= 768 && 
-                    !elements.sidebar.contains(e.target) && 
-                    e.target !== elements.toggleSidebar) {
-                    elements.sidebar.classList.remove('active');
-                }
-            });
-            
-            // Save before unload
-            window.addEventListener('beforeunload', () => {
-                if (state.isLoggedIn) {
-                    saveToLocalStorage();
-                }
-            });
         }
 
-        // Update editor split
-        function updateEditorSplit() {
-            elements.codeEditor.style.width = `${state.editorSplit}%`;
-            elements.previewContainer.style.width = `${100 - state.editorSplit}%`;
-        }
-
-        // Show new file modal
-        function showNewFileModal() {
-            elements.newFileModal.style.display = 'flex';
-            elements.fileName.value = '';
-            elements.fileType.value = 'html';
-            elements.fileName.focus();
-        }
-
-        // Hide new file modal
-        function hideNewFileModal() {
-            elements.newFileModal.style.display = 'none';
-        }
-
-        // Create new file
-        function createNewFile() {
-            const filename = elements.fileName.value.trim();
-            const fileType = elements.fileType.value;
+        // Open a file in the editor
+        function openFile(fileName) {
+            if (!files[fileName]) return;
             
-            if (!filename) {
-                showNotification('Please enter a filename', 'error');
+            currentFile = fileName;
+            const file = files[fileName];
+            
+            // Update the editor content
+            codeEditor.value = file.content;
+            
+            // Update the language selector
+            languageSelector.value = file.type;
+            updateEditorMode();
+            
+            // Update the preview if it's an HTML file
+            if (file.type === 'html') {
+                updatePreview();
+            } else {
+                previewFrame.srcdoc = `<pre>${file.content}</pre>`;
+            }
+            
+            // Update the active file in the sidebar
+            renderFileList();
+        }
+
+        // Update the editor mode based on the selected language
+        function updateEditorMode() {
+            if (!currentFile) return;
+            
+            const language = languageSelector.value;
+            files[currentFile].type = language;
+            
+            // In a real implementation, you would use CodeMirror or Monaco editor
+            // and set the appropriate mode here. For this simple example, we'll
+            // just update the file type in our state.
+        }
+
+        // Update the preview frame
+        function updatePreview() {
+            if (!currentFile || files[currentFile].type !== 'html') return;
+            
+            const htmlContent = files[currentFile].content;
+            const cssContent = files['style.css']?.content || '';
+            const jsContent = files['script.js']?.content || '';
+            
+            const fullHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>${cssContent}</style>
+                </head>
+                <body>
+                    ${htmlContent.replace('<script src="script.js"></script>', '')}
+                    <script>${jsContent}</script>
+                </body>
+                </html>
+            `;
+            
+            previewFrame.srcdoc = fullHtml;
+        }
+
+        // Open the add page modal
+        function openAddPageModal() {
+            pageNameInput.value = '';
+            pageTypeSelect.value = 'html';
+            addPageModal.style.display = 'flex';
+            pageNameInput.focus();
+        }
+
+        // Close the add page modal
+        function closeAddPageModal() {
+            addPageModal.style.display = 'none';
+        }
+
+        // Add a new page
+        function addNewPage() {
+            const name = pageNameInput.value.trim();
+            const type = pageTypeSelect.value;
+            
+            if (!name) {
+                alert('Please enter a page name');
                 return;
             }
             
-            // Add extension if not provided
-            let fullFilename = filename.includes('.') ? filename : `${filename}.${fileType}`;
+            const extension = languageExtensions[type] || '.txt';
+            const fileName = name + extension;
             
-            // Default content based on file type
-            let defaultContent = '';
-            switch (fileType) {
+            if (files[fileName]) {
+                alert('A file with this name already exists');
+                return;
+            }
+            
+            // Create a new file with default content based on type
+            let content = '';
+            switch (type) {
                 case 'html':
-                    defaultContent = `<!DOCTYPE html>
+                    content = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${filename.replace('.html', '')}</title>
+    <title>${name}</title>
 </head>
 <body>
-    <!-- Your HTML content here -->
+    <h1>${name}</h1>
 </body>
 </html>`;
                     break;
                 case 'css':
-                    defaultContent = `/* ${filename} styles */`;
+                    content = `/* ${name} styles */`;
                     break;
+                case 'javascript':
                 case 'js':
-                    defaultContent = `// ${filename} JavaScript\nconsole.log('Hello from ${filename}');`;
+                case 'node':
+                    content = `// ${name} JavaScript`;
                     break;
-                case 'py':
-                    defaultContent = `# ${filename} Python\nprint("Hello from ${filename}")`;
+                case 'python':
+                    content = `# ${name} Python script`;
                     break;
+                default:
+                    content = `// ${name} ${type} file`;
             }
             
-            // Add the new file
-            state.files[fullFilename] = {
-                name: fullFilename,
-                type: fileType,
-                content: defaultContent,
-                active: false
+            files[fileName] = {
+                name: fileName,
+                type: type,
+                content: content
             };
             
-            // Refresh the file list and open the new file
-            renderFileList();
-            renderEditorTabs();
-            openFile(fullFilename);
-            hideNewFileModal();
+            // Save to localStorage
+            localStorage.setItem('codeTesterFiles', JSON.stringify(files));
             
-            showNotification(`Created new file: ${fullFilename}`);
+            // Close the modal and open the new file
+            closeAddPageModal();
+            openFile(fileName);
         }
 
         // Delete a file
-        function deleteFile(filename) {
-            if (confirm(`Are you sure you want to delete ${filename}?`)) {
-                delete state.files[filename];
-                
-                // If we're deleting the current file, clear the editor
-                if (state.currentFile === filename) {
-                    const remainingFiles = Object.keys(state.files);
-                    if (remainingFiles.length > 0) {
-                        openFile(remainingFiles[0]);
-                    } else {
-                        state.currentFile = null;
-                        elements.codeEditor.value = '';
-                        elements.outputPreview.innerHTML = '';
-                    }
-                }
-                
+        function deleteFile(fileName) {
+            if (Object.keys(files).length <= 1) {
+                alert('You must have at least one file');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to delete ${fileName}?`)) {
+                return;
+            }
+            
+            delete files[fileName];
+            localStorage.setItem('codeTesterFiles', JSON.stringify(files));
+            
+            // If we deleted the current file, open another one
+            if (currentFile === fileName) {
+                const remainingFiles = Object.keys(files);
+                openFile(remainingFiles[0]);
+            } else {
                 renderFileList();
-                renderEditorTabs();
+            }
+        }
+
+        // Save the current file
+        function saveCurrentFile() {
+            if (!currentFile) return;
+            
+            files[currentFile].content = codeEditor.value;
+            localStorage.setItem('codeTesterFiles', JSON.stringify(files));
+            
+            // Update preview if this is an HTML file
+            if (files[currentFile].type === 'html') {
+                updatePreview();
+            }
+            
+            // Show a temporary message
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = 'Saved!';
+            setTimeout(() => {
+                saveBtn.textContent = originalText;
+            }, 2000);
+        }
+
+        // Initialize the app when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Handle editor changes
+        codeEditor.addEventListener('input', () => {
+            if (currentFile) {
+                files[currentFile].content = codeEditor.value;
                 
-                showNotification(`Deleted file: ${filename}`);
-            }
-        }
-
-        // Close a tab
-        function closeTab(filename) {
-            if (Object.keys(state.files).length <= 1) {
-                showNotification('Cannot close the last file', 'error');
-                return;
-            }
-            
-            deleteFile(filename);
-        }
-
-        // Show login modal
-        function showLoginModal() {
-            elements.loginModal.style.display = 'flex';
-            elements.loginEmail.value = '';
-            elements.loginPassword.value = '';
-            elements.loginEmail.focus();
-        }
-
-        // Hide login modal
-        function hideLoginModal() {
-            elements.loginModal.style.display = 'none';
-        }
-
-        // Handle login
-        function handleLogin() {
-            const email = elements.loginEmail.value.trim();
-            const password = elements.loginPassword.value.trim();
-            
-            if (!email || !password) {
-                showNotification('Please enter both email and password', 'error');
-                return;
-            }
-            
-            // Mock login - in a real app, you would authenticate with a server
-            state.user = {
-                name: email.split('@')[0],
-                email: email
-            };
-            state.isLoggedIn = true;
-            
-            // Save user to localStorage
-            localStorage.setItem('codeplay_user', JSON.stringify(state.user));
-            
-            // Update UI
-            updateLoginUI();
-            hideLoginModal();
-            
-            // Restore saved state
-            restoreState();
-            
-            showNotification(`Welcome back, ${state.user.name}!`);
-        }
-
-        // Handle social login
-        function handleSocialLogin(provider) {
-            // Mock social login
-            const randomName = `User${Math.floor(Math.random() * 1000)}`;
-            const email = `${randomName.toLowerCase()}@${provider}.com`;
-            
-            state.user = {
-                name: randomName,
-                email: email
-            };
-            state.isLoggedIn = true;
-            
-            // Save user to localStorage
-            localStorage.setItem('codeplay_user', JSON.stringify(state.user));
-            
-            // Update UI
-            updateLoginUI();
-            hideLoginModal();
-            
-            // Restore saved state
-            restoreState();
-            
-            showNotification(`Welcome, ${randomName}! (${provider} login)`);
-        }
-
-        // Start the application
-        window.addEventListener('load', () => {
-            init();
-            
-            // Open index.html by default
-            if (state.currentFile) {
-                openFile(state.currentFile);
+                // Auto-update preview for HTML files
+                if (files[currentFile].type === 'html') {
+                    updatePreview();
+                }
             }
         });
     </script>
