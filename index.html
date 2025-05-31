@@ -3,336 +3,745 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All-in-One Code Tester</title>
+    <title>CodePlay - Multi-Language Playground</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.10.5/brython.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.10.5/brython_stdlib.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Global Styles */
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --dark-gray: #334155;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            overflow: hidden;
         }
 
+        /* Header Styles */
         header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 1rem;
+            background-color: rgba(15, 23, 42, 0.95);
+            padding: 0.75rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            z-index: 100;
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
         }
 
+        .logo-icon {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--gray);
+            border: 1px solid var(--gray);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--light);
+            color: var(--light);
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 2.25rem;
+            height: 2.25rem;
+            justify-content: center;
+        }
+
+        /* Main Layout */
         .main-container {
             display: flex;
             flex: 1;
             overflow: hidden;
         }
 
-        /* File Explorer */
-        .file-explorer {
-            width: 250px;
-            background-color: #34495e;
-            color: white;
-            padding: 1rem;
-            overflow-y: auto;
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background-color: rgba(15, 23, 42, 0.95);
+            border-right: 1px solid rgba(148, 163, 184, 0.2);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            z-index: 90;
         }
 
-        .file-explorer-header {
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
         }
 
-        .add-file-btn {
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            padding: 0.3rem 0.6rem;
-            border-radius: 4px;
-            cursor: pointer;
+        .sidebar-title {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray);
         }
 
         .file-list {
-            list-style: none;
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
         }
 
         .file-item {
-            padding: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
             cursor: pointer;
-            border-radius: 4px;
-            margin-bottom: 0.3rem;
             display: flex;
-            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.25rem;
+            position: relative;
+            transition: all 0.2s;
         }
 
         .file-item:hover {
-            background-color: #3d566e;
+            background-color: rgba(148, 163, 184, 0.1);
         }
 
         .file-item.active {
-            background-color: #2980b9;
+            background-color: rgba(124, 58, 237, 0.2);
+            color: var(--primary);
+        }
+
+        .file-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .file-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.9375rem;
         }
 
         .file-actions {
             display: none;
+            position: absolute;
+            right: 0.75rem;
+            background-color: var(--dark);
+            border-radius: 0.25rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         .file-item:hover .file-actions {
             display: flex;
-            gap: 0.3rem;
         }
 
         .file-action {
-            background: none;
-            border: none;
-            color: white;
+            padding: 0.375rem;
+            color: var(--gray);
             cursor: pointer;
-            font-size: 0.8rem;
+            transition: color 0.2s;
         }
 
-        /* Editor Section */
-        .editor-section {
+        .file-action:hover {
+            color: var(--danger);
+        }
+
+        /* Editor Area */
+        .editor-area {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
-        .editor-toolbar {
-            background-color: #ecf0f1;
-            padding: 0.5rem 1rem;
+        .editor-tabs {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #ddd;
+            background-color: rgba(15, 23, 42, 0.9);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            overflow-x: auto;
         }
 
-        .filename-display {
-            font-weight: bold;
-        }
-
-        .run-btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
+        .editor-tab {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.875rem;
             cursor: pointer;
-            font-weight: bold;
+            border-right: 1px solid rgba(148, 163, 184, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 160px;
+            transition: all 0.2s;
+        }
+
+        .editor-tab.active {
+            background-color: rgba(30, 41, 59, 0.9);
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .editor-tab-close {
+            margin-left: auto;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .editor-tab:hover .editor-tab-close {
+            opacity: 1;
         }
 
         .editor-container {
-            display: flex;
             flex: 1;
+            display: flex;
             overflow: hidden;
+            position: relative;
         }
 
         .code-editor {
             flex: 1;
             padding: 1rem;
+            background-color: rgba(15, 23, 42, 0.9);
+            color: var(--light);
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 1.5;
             border: none;
             resize: none;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            background-color: #f8f9fa;
             outline: none;
+            tab-size: 2;
         }
 
-        /* Preview Section */
-        .preview-section {
+        .preview-container {
             flex: 1;
             padding: 1rem;
             overflow: auto;
             background-color: white;
-            border-left: 1px solid #ddd;
+            color: #1e293b;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .preview-title {
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-            color: #7f8c8d;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 0.5rem;
         }
 
         /* Splitter */
         .splitter {
-            width: 5px;
-            background-color: #ddd;
+            width: 8px;
+            background-color: rgba(30, 41, 59, 0.9);
             cursor: col-resize;
+            position: relative;
+            transition: background-color 0.2s;
         }
 
-        /* Add File Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
+        .splitter:hover {
+            background-color: var(--primary);
         }
 
-        .modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            width: 400px;
-            max-width: 90%;
+        .splitter::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 1px;
+            right: 1px;
+            height: 30px;
+            background-color: var(--gray);
+            border-radius: 3px;
+            transform: translateY(-50%);
         }
 
-        .modal-header {
+        /* Console */
+        .console {
+            height: 180px;
+            background-color: #0f172a;
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+            overflow: auto;
+            padding: 0.75rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+        }
+
+        .console-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.5rem;
         }
 
-        .close-modal {
+        .console-title {
+            font-size: 0.8125rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .console-clear {
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 0.8125rem;
+            transition: color 0.2s;
+        }
+
+        .console-clear:hover {
+            color: var(--light);
+        }
+
+        .console-content {
+            white-space: pre-wrap;
+        }
+
+        .log-message {
+            margin-bottom: 0.25rem;
+        }
+
+        .log-error {
+            color: var(--danger);
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                width: 280px;
+                z-index: 95;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.3);
+            }
+
+            .editor-tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .editor-tab {
+                min-width: 140px;
+                padding: 0.75rem 1rem;
+            }
+
+            .preview-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 15;
+                display: none;
+            }
+
+            .preview-container.active {
+                display: block;
+            }
+
+            .mobile-toolbar {
+                display: flex;
+                padding: 0.5rem;
+                background-color: rgba(30, 41, 59, 0.9);
+                border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            }
+
+            .mobile-view-toggle {
+                display: flex;
+                gap: 0.5rem;
+                margin-left: auto;
+            }
+
+            .view-btn {
+                padding: 0.375rem 0.75rem;
+                background-color: transparent;
+                border: 1px solid var(--gray);
+                border-radius: 0.25rem;
+                color: var(--gray);
+                cursor: pointer;
+                font-size: 0.8125rem;
+                transition: all 0.2s;
+            }
+
+            .view-btn.active {
+                background-color: var(--primary);
+                border-color: var(--primary);
+                color: white;
+            }
+        }
+
+        /* Toggle Sidebar Button */
+        .toggle-sidebar {
+            display: none;
             background: none;
             border: none;
-            font-size: 1.5rem;
+            color: var(--gray);
             cursor: pointer;
+            font-size: 1.25rem;
+            transition: color 0.2s;
         }
 
-        .form-group {
-            margin-bottom: 1rem;
+        .toggle-sidebar:hover {
+            color: var(--light);
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
+        @media (max-width: 768px) {
+            .toggle-sidebar {
+                display: block;
+            }
+        }
+
+        /* Loading Indicator */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--dark);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background-color: var(--success);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Icons */
+        .icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Login User Info */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
             font-weight: bold;
         }
 
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        .username {
+            font-size: 0.875rem;
         }
 
-        .modal-footer {
+        /* Welcome Screen */
+        .welcome-screen {
             display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 2rem;
+            text-align: center;
+            background-color: rgba(15, 23, 42, 0.8);
         }
 
-        .btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+        .welcome-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
         }
 
-        .btn-primary {
-            background-color: #3498db;
-            color: white;
+        .welcome-subtitle {
+            color: var(--gray);
+            margin-bottom: 2rem;
+            max-width: 600px;
         }
 
-        .btn-secondary {
-            background-color: #95a5a6;
-            color: white;
+        .welcome-actions {
+            display: flex;
+            gap: 1rem;
         }
 
-        /* Console Output */
-        #console-output {
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            padding: 0.5rem;
-            font-family: monospace;
-            white-space: pre-wrap;
-            max-height: 150px;
-            overflow-y: auto;
-            margin-top: 1rem;
-            border-radius: 4px;
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
         }
     </style>
 </head>
 <body onload="brython()">
+    <!-- Header -->
     <header>
-        <div class="logo">Code Tester</div>
-        <div>
-            <button id="new-file-btn" class="run-btn">+ New File</button>
+        <div class="logo">
+            <span class="logo-icon icon">💻</span>
+            <span>CodePlay</span>
+        </div>
+        <div class="header-actions">
+            <div id="user-info" class="user-info" style="display: none;">
+                <div class="user-avatar" id="user-avatar">U</div>
+                <span class="username" id="username">User</span>
+            </div>
+            <button id="login-btn" class="btn btn-outline">
+                <span class="icon">👤</span>
+                <span>Login</span>
+            </button>
+            <button id="run-btn" class="btn btn-primary">
+                <span class="icon">▶️</span>
+                <span>Run</span>
+            </button>
+            <button class="toggle-sidebar" id="toggle-sidebar">☰</button>
         </div>
     </header>
 
+    <!-- Main Content -->
     <div class="main-container">
-        <div class="file-explorer">
-            <div class="file-explorer-header">
-                <h3>Files</h3>
-                <button class="add-file-btn" id="add-file-btn">+</button>
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Explorer</div>
+                <button id="new-file-btn" class="btn-icon tooltip" data-tooltip="New File">
+                    <span class="icon">+</span>
+                </button>
             </div>
-            <ul class="file-list" id="file-list">
+            <div class="file-list" id="file-list">
                 <!-- Files will be added here dynamically -->
-            </ul>
+            </div>
         </div>
 
-        <div class="editor-section">
-            <div class="editor-toolbar">
-                <div class="filename-display" id="filename-display">No file selected</div>
-                <button class="run-btn" id="run-code-btn">Run Code</button>
+        <!-- Editor Area -->
+        <div class="editor-area">
+            <div class="editor-tabs" id="editor-tabs">
+                <!-- Tabs will be added here dynamically -->
             </div>
-            <div class="editor-container">
-                <textarea id="code-editor" class="code-editor" placeholder="Select or create a file to start coding..."></textarea>
-                <div class="splitter" id="splitter"></div>
-                <div class="preview-section" id="preview-section">
-                    <div class="preview-title">Output Preview</div>
-                    <div id="output-preview"></div>
-                    <div id="console-output"></div>
+            <div class="mobile-toolbar">
+                <div class="mobile-view-toggle">
+                    <button class="view-btn active" data-view="editor">Editor</button>
+                    <button class="view-btn" data-view="preview">Preview</button>
                 </div>
             </div>
+            <div class="editor-container">
+                <textarea id="code-editor" class="code-editor" spellcheck="false"></textarea>
+                <div class="splitter" id="splitter"></div>
+                <div class="preview-container" id="preview-container">
+                    <div class="preview-header">
+                        <div class="preview-title">Output Preview</div>
+                        <div class="preview-actions">
+                            <button id="refresh-preview" class="btn-icon tooltip" data-tooltip="Refresh">
+                                <span class="icon">🔄</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="output-preview"></div>
+                </div>
+            </div>
+            <div class="console">
+                <div class="console-header">
+                    <div class="console-title">Console</div>
+                    <button class="console-clear" id="clear-console">Clear</button>
+                </div>
+                <div class="console-content" id="console-output"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Add File Modal -->
-    <div class="modal" id="add-file-modal">
+    <!-- New File Modal -->
+    <div class="modal" id="new-file-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Create New File</h3>
-                <button class="close-modal">&times;</button>
+                <div class="modal-title">Create New File</div>
+                <button class="modal-close" id="close-new-file-modal">&times;</button>
             </div>
-            <div class="form-group">
-                <label for="new-filename">File Name</label>
-                <input type="text" id="new-filename" placeholder="e.g., index.html">
-            </div>
-            <div class="form-group">
-                <label for="file-type">File Type</label>
-                <select id="file-type">
-                    <option value="html">HTML</option>
-                    <option value="css">CSS</option>
-                    <option value="js">JavaScript</option>
-                    <option value="py">Python</option>
-                </select>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="file-name" class="form-label">File Name</label>
+                    <input type="text" id="file-name" class="form-input" placeholder="index.html">
+                </div>
+                <div class="form-group">
+                    <label for="file-type" class="form-label">File Type</label>
+                    <select id="file-type" class="form-input form-select">
+                        <option value="html">HTML</option>
+                        <option value="css">CSS</option>
+                        <option value="js">JavaScript</option>
+                        <option value="py">Python</option>
+                    </select>
+                </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancel-add-file">Cancel</button>
-                <button class="btn btn-primary" id="confirm-add-file">Create</button>
+                <button class="btn btn-outline" id="cancel-new-file">Cancel</button>
+                <button class="btn btn-primary" id="create-new-file">Create</button>
             </div>
         </div>
     </div>
 
+    <!-- Login Modal -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Login to CodePlay</div>
+                <button class="modal-close" id="close-login-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="login-email" class="form-label">Email</label>
+                    <input type="email" id="login-email" class="form-input" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="login-password" class="form-label">Password</label>
+                    <input type="password" id="login-password" class="form-input" placeholder="••••••••">
+                </div>
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <button id="google-login" class="btn btn-outline" style="width: 100%; justify-content: center;">
+                        <span class="icon">G</span>
+                        <span>Continue with Google</span>
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button id="github-login" class="btn btn-outline" style="width: 100%; justify-content: center;">
+                        <span class="icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"></path>
+                            </svg>
+                        </span>
+                        <span>Continue with GitHub</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-login">Cancel</button>
+                <button class="btn btn-primary" id="confirm-login">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
     <script>
-        // File system and application state
+        // Application State
         const state = {
             files: {
                 'index.html': {
@@ -343,43 +752,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Page</title>
+    <title>My Awesome Page</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Hello World!</h1>
-    <p>Welcome to my page.</p>
+    <h1>Welcome to CodePlay!</h1>
+    <p>Edit this code and click "Run" to see the results.</p>
+    <script src="script.js"></script>
 </body>
-</html>`
+</html>`,
+                    active: true
                 },
                 'style.css': {
                     name: 'style.css',
                     type: 'css',
                     content: `body {
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
     line-height: 1.6;
     margin: 0;
-    padding: 20px;
-    background-color: #f4f4f4;
+    padding: 2rem;
+    background-color: #f8fafc;
+    color: #1e293b;
 }
 
 h1 {
-    color: #333;
-}`
+    color: #7c3aed;
+    margin-bottom: 1rem;
+}`,
+                    active: false
                 },
                 'script.js': {
                     name: 'script.js',
                     type: 'js',
                     content: `console.log('Hello from JavaScript!');
 
-function greet(name) {
-    return 'Hello, ' + name + '!';
+// Simple counter
+let count = 0;
+
+function updateCounter() {
+    count++;
+    document.getElementById('counter').textContent = count;
 }
 
-// Try calling the function
-console.log(greet('World'));`
+// Create counter element
+const counterElement = document.createElement('div');
+counterElement.id = 'counter';
+counterElement.textContent = '0';
+counterElement.style.fontSize = '2rem';
+counterElement.style.margin = '1rem 0';
+counterElement.style.cursor = 'pointer';
+counterElement.onclick = updateCounter;
+
+document.body.appendChild(counterElement);`,
+                    active: false
                 },
-                'main.py': {
-                    name: 'main.py',
+                'app.py': {
+                    name: 'app.py',
                     type: 'py',
                     content: `print("Hello from Python!")
 
@@ -389,69 +817,413 @@ def factorial(n):
     else:
         return n * factorial(n-1)
 
-# Test the function
-print(factorial(5))`
+# Calculate factorial of 5
+print(f"Factorial of 5 is: {factorial(5)}")`,
+                    active: false
                 }
             },
-            currentFile: null
+            currentFile: 'index.html',
+            user: null,
+            isLoggedIn: false,
+            editorSplit: 50
         };
 
-        // DOM elements
+        // DOM Elements
         const elements = {
+            sidebar: document.getElementById('sidebar'),
             fileList: document.getElementById('file-list'),
+            editorTabs: document.getElementById('editor-tabs'),
             codeEditor: document.getElementById('code-editor'),
-            filenameDisplay: document.getElementById('filename-display'),
             outputPreview: document.getElementById('output-preview'),
             consoleOutput: document.getElementById('console-output'),
-            runCodeBtn: document.getElementById('run-code-btn'),
-            addFileBtn: document.getElementById('add-file-btn'),
+            runBtn: document.getElementById('run-btn'),
             newFileBtn: document.getElementById('new-file-btn'),
-            addFileModal: document.getElementById('add-file-modal'),
-            newFilename: document.getElementById('new-filename'),
+            loginBtn: document.getElementById('login-btn'),
+            toggleSidebar: document.getElementById('toggle-sidebar'),
+            newFileModal: document.getElementById('new-file-modal'),
+            fileName: document.getElementById('file-name'),
             fileType: document.getElementById('file-type'),
-            cancelAddFile: document.getElementById('cancel-add-file'),
-            confirmAddFile: document.getElementById('confirm-add-file'),
-            closeModal: document.querySelector('.close-modal'),
+            createNewFile: document.getElementById('create-new-file'),
+            cancelNewFile: document.getElementById('cancel-new-file'),
+            closeNewFileModal: document.getElementById('close-new-file-modal'),
+            loginModal: document.getElementById('login-modal'),
+            loginEmail: document.getElementById('login-email'),
+            loginPassword: document.getElementById('login-password'),
+            confirmLogin: document.getElementById('confirm-login'),
+            cancelLogin: document.getElementById('cancel-login'),
+            closeLoginModal: document.getElementById('close-login-modal'),
+            googleLogin: document.getElementById('google-login'),
+            githubLogin: document.getElementById('github-login'),
             splitter: document.getElementById('splitter'),
-            previewSection: document.getElementById('preview-section')
+            previewContainer: document.getElementById('preview-container'),
+            refreshPreview: document.getElementById('refresh-preview'),
+            clearConsole: document.getElementById('clear-console'),
+            viewToggle: document.querySelectorAll('.view-btn'),
+            notification: document.getElementById('notification'),
+            userInfo: document.getElementById('user-info'),
+            userAvatar: document.getElementById('user-avatar'),
+            username: document.getElementById('username')
         };
 
         // Initialize the application
         function init() {
             renderFileList();
+            renderEditorTabs();
+            loadFile(state.currentFile);
             setupEventListeners();
-            setupSplitter();
+            restoreState();
+            setupBrython();
+            checkLoginStatus();
+
+            // Set initial split
+            updateEditorSplit();
+
+            // Show welcome message
+            showNotification('Welcome to CodePlay! Start coding now.');
         }
 
-        // Render the file list
+        // Render file list
         function renderFileList() {
             elements.fileList.innerHTML = '';
             
             Object.values(state.files).forEach(file => {
-                const fileItem = document.createElement('li');
-                fileItem.className = `file-item ${state.currentFile?.name === file.name ? 'active' : ''}`;
+                const fileItem = document.createElement('div');
+                fileItem.className = `file-item ${file.active ? 'active' : ''}`;
+                
+                // Get appropriate icon based on file type
+                let icon;
+                switch(file.type) {
+                    case 'html': icon = '📄'; break;
+                    case 'css': icon = '🎨'; break;
+                    case 'js': icon = '📜'; break;
+                    case 'py': icon = '🐍'; break;
+                    default: icon = '📁';
+                }
+                
                 fileItem.innerHTML = `
-                    <span>${file.name}</span>
+                    <span class="file-icon">${icon}</span>
+                    <span class="file-name">${file.name}</span>
                     <div class="file-actions">
-                        <button class="file-action" data-action="delete" data-filename="${file.name}">🗑️</button>
+                        <span class="file-action" data-action="delete" data-filename="${file.name}">🗑️</span>
                     </div>
                 `;
+                
                 fileItem.addEventListener('click', () => openFile(file.name));
                 elements.fileList.appendChild(fileItem);
             });
         }
 
-        // Set up event listeners
+        // Render editor tabs
+        function renderEditorTabs() {
+            elements.editorTabs.innerHTML = '';
+            
+            Object.values(state.files).forEach(file => {
+                const tab = document.createElement('div');
+                tab.className = `editor-tab ${file.active ? 'active' : ''}`;
+                
+                // Get appropriate icon based on file type
+                let icon;
+                switch(file.type) {
+                    case 'html': icon = '📄'; break;
+                    case 'css': icon = '🎨'; break;
+                    case 'js': icon = '📜'; break;
+                    case 'py': icon = '🐍'; break;
+                    default: icon = '📁';
+                }
+                
+                tab.innerHTML = `
+                    <span>${icon}</span>
+                    <span>${file.name}</span>
+                    <span class="editor-tab-close" data-filename="${file.name}">×</span>
+                `;
+                
+                tab.addEventListener('click', () => openFile(file.name));
+                elements.editorTabs.appendChild(tab);
+            });
+        }
+
+        // Load file content into editor
+        function loadFile(filename) {
+            if (!state.files[filename]) return;
+            
+            // Mark all files as inactive
+            Object.values(state.files).forEach(file => file.active = false);
+            
+            // Set current file as active
+            state.files[filename].active = true;
+            state.currentFile = filename;
+            elements.codeEditor.value = state.files[filename].content;
+            
+            // Update UI
+            renderFileList();
+            renderEditorTabs();
+        }
+
+        // Open a file
+        function openFile(filename) {
+            saveCurrentFile();
+            loadFile(filename);
+        }
+
+        // Save current file
+        function saveCurrentFile() {
+            if (state.currentFile) {
+                state.files[state.currentFile].content = elements.codeEditor.value;
+                
+                // Save to localStorage if logged in
+                if (state.isLoggedIn) {
+                    saveToLocalStorage();
+                }
+            }
+        }
+
+        // Run the current code
+        function runCode() {
+            saveCurrentFile();
+            clearConsole();
+            
+            if (!state.currentFile) {
+                showNotification('No file selected');
+                return;
+            }
+            
+            const file = state.files[state.currentFile];
+            
+            // Capture console.log output
+            const originalConsoleLog = console.log;
+            const originalConsoleError = console.error;
+            let consoleOutput = '';
+            
+            console.log = function(message) {
+                if (typeof message === 'object') {
+                    consoleOutput += JSON.stringify(message) + '\n';
+                } else {
+                    consoleOutput += message + '\n';
+                }
+                originalConsoleLog.apply(console, arguments);
+            };
+            
+            console.error = function(message) {
+                consoleOutput += `Error: ${message}\n`;
+                originalConsoleError.apply(console, arguments);
+            };
+            
+            try {
+                switch(file.type) {
+                    case 'html':
+                        elements.outputPreview.innerHTML = file.content;
+                        break;
+                        
+                    case 'css':
+                        elements.outputPreview.innerHTML = `
+                            <style>${file.content}</style>
+                            <div class="css-preview">
+                                <h1>CSS Preview</h1>
+                                <p>This is a preview of your CSS styles.</p>
+                                <button class="preview-btn">Sample Button</button>
+                                <div class="preview-box"></div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'js':
+                        // Clear previous output
+                        elements.outputPreview.innerHTML = '';
+                        
+                        // Execute the JavaScript code
+                        const result = eval(file.content);
+                        
+                        // Display the return value (if any)
+                        if (result !== undefined) {
+                            logToConsole(`Return value: ${JSON.stringify(result)}`);
+                        }
+                        break;
+                        
+                    case 'py':
+                        // Execute Python code using Brython
+                        if (typeof __BRYTHON__ !== 'undefined') {
+                            try {
+                                const output = [];
+                                const originalPrint = __BRYTHON__.builtins.print;
+                                
+                                __BRYTHON__.builtins.print = function() {
+                                    const args = Array.from(arguments).map(arg => 
+                                        typeof arg === 'object' ? JSON.stringify(arg) : arg
+                                    );
+                                    output.push(args.join(' '));
+                                    originalPrint.apply(this, arguments);
+                                };
+                                
+                                __BRYTHON__.run_python(file.content, 'exec');
+                                elements.outputPreview.innerHTML = `<pre>${output.join('\n')}</pre>`;
+                                
+                                // Restore original print
+                                __BRYTHON__.builtins.print = originalPrint;
+                            } catch (error) {
+                                elements.outputPreview.innerHTML = `<div class="error">Python Error: ${error}</div>`;
+                            }
+                        }
+                        break;
+                }
+            } catch (error) {
+                elements.outputPreview.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+            
+            // Display console output
+            if (consoleOutput) {
+                logToConsole(consoleOutput);
+            }
+            
+            // Restore original console.log
+            console.log = originalConsoleLog;
+            console.error = originalConsoleError;
+        }
+
+        // Log message to console
+        function logToConsole(message) {
+            const consoleElement = elements.consoleOutput;
+            const lines = message.split('\n');
+            
+            lines.forEach(line => {
+                if (line.trim() === '') return;
+                
+                const isError = line.startsWith('Error:');
+                const logElement = document.createElement('div');
+                logElement.className = `log-message ${isError ? 'log-error' : ''}`;
+                logElement.textContent = line;
+                consoleElement.appendChild(logElement);
+            });
+            
+            // Scroll to bottom
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        }
+
+        // Clear console
+        function clearConsole() {
+            elements.consoleOutput.innerHTML = '';
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = elements.notification;
+            notification.textContent = message;
+            
+            // Set background color based on type
+            switch(type) {
+                case 'success':
+                    notification.style.backgroundColor = 'var(--success)';
+                    break;
+                case 'error':
+                    notification.style.backgroundColor = 'var(--danger)';
+                    break;
+                case 'warning':
+                    notification.style.backgroundColor = 'var(--warning)';
+                    break;
+                default:
+                    notification.style.backgroundColor = 'var(--primary)';
+            }
+            
+            notification.classList.add('show');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Save state to localStorage
+        function saveToLocalStorage() {
+            if (state.isLoggedIn) {
+                const data = {
+                    files: state.files,
+                    currentFile: state.currentFile,
+                    editorSplit: state.editorSplit
+                };
+                localStorage.setItem(`codeplay_${state.user.email}`, JSON.stringify(data));
+                showNotification('Changes saved successfully');
+            }
+        }
+
+        // Restore state from localStorage
+        function restoreState() {
+            if (state.isLoggedIn) {
+                const savedData = localStorage.getItem(`codeplay_${state.user.email}`);
+                if (savedData) {
+                    try {
+                        const data = JSON.parse(savedData);
+                        state.files = data.files || state.files;
+                        state.currentFile = data.currentFile || state.currentFile;
+                        state.editorSplit = data.editorSplit || state.editorSplit;
+                        showNotification('Restored your previous session');
+                    } catch (e) {
+                        console.error('Failed to parse saved data:', e);
+                    }
+                }
+            }
+        }
+
+        // Check login status
+        function checkLoginStatus() {
+            const savedUser = localStorage.getItem('codeplay_user');
+            if (savedUser) {
+                try {
+                    state.user = JSON.parse(savedUser);
+                    state.isLoggedIn = true;
+                    updateLoginUI();
+                    restoreState();
+                } catch (e) {
+                    console.error('Failed to parse user data:', e);
+                }
+            }
+        }
+
+        // Update login UI
+        function updateLoginUI() {
+            if (state.isLoggedIn) {
+                elements.loginBtn.style.display = 'none';
+                elements.userInfo.style.display = 'flex';
+                elements.userAvatar.textContent = state.user.name.charAt(0).toUpperCase();
+                elements.username.textContent = state.user.name;
+            } else {
+                elements.loginBtn.style.display = 'flex';
+                elements.userInfo.style.display = 'none';
+            }
+        }
+
+        // Setup Brython
+        function setupBrython() {
+            if (typeof __BRYTHON__ === 'undefined') return;
+            
+            // Add a run_python function to the global scope
+            __BRYTHON__.run_python = function(src, mode) {
+                try {
+                    return __BRYTHON__.$py_src_to_js(src, mode);
+                } catch (err) {
+                    throw err;
+                }
+            };
+        }
+
+        // Setup event listeners
         function setupEventListeners() {
             // File operations
-            elements.addFileBtn.addEventListener('click', showAddFileModal);
-            elements.newFileBtn.addEventListener('click', showAddFileModal);
-            elements.cancelAddFile.addEventListener('click', hideAddFileModal);
-            elements.closeModal.addEventListener('click', hideAddFileModal);
-            elements.confirmAddFile.addEventListener('click', createNewFile);
+            elements.newFileBtn.addEventListener('click', showNewFileModal);
+            elements.createNewFile.addEventListener('click', createNewFile);
+            elements.cancelNewFile.addEventListener('click', hideNewFileModal);
+            elements.closeNewFileModal.addEventListener('click', hideNewFileModal);
+            
+            // Login operations
+            elements.loginBtn.addEventListener('click', showLoginModal);
+            elements.confirmLogin.addEventListener('click', handleLogin);
+            elements.cancelLogin.addEventListener('click', hideLoginModal);
+            elements.closeLoginModal.addEventListener('click', hideLoginModal);
+            elements.googleLogin.addEventListener('click', () => handleSocialLogin('google'));
+            elements.githubLogin.addEventListener('click', () => handleSocialLogin('github'));
             
             // Code execution
-            elements.runCodeBtn.addEventListener('click', runCode);
+            elements.runBtn.addEventListener('click', runCode);
+            elements.refreshPreview.addEventListener('click', runCode);
+            elements.clearConsole.addEventListener('click', clearConsole);
             
             // Editor changes
             elements.codeEditor.addEventListener('input', saveCurrentFile);
@@ -461,56 +1233,102 @@ print(factorial(5))`
                 if (e.target.dataset.action === 'delete') {
                     deleteFile(e.target.dataset.filename);
                 }
+                if (e.target.classList.contains('editor-tab-close')) {
+                    closeTab(e.target.dataset.filename);
+                }
             });
-        }
-
-        // Set up the splitter between editor and preview
-        function setupSplitter() {
-            let isDragging = false;
             
-            elements.splitter.addEventListener('mousedown', (e) => {
+            // Splitter
+            let isDragging = false;
+            elements.splitter.addEventListener('mousedown', () => {
                 isDragging = true;
                 document.body.style.cursor = 'col-resize';
-                e.preventDefault();
             });
             
             document.addEventListener('mousemove', (e) => {
                 if (!isDragging) return;
                 
                 const containerWidth = document.querySelector('.editor-container').offsetWidth;
-                const newWidth = e.clientX - elements.codeEditor.getBoundingClientRect().left;
+                const editorRect = elements.codeEditor.getBoundingClientRect();
+                const newWidth = e.clientX - editorRect.left;
                 const newPercentage = (newWidth / containerWidth) * 100;
                 
-                elements.codeEditor.style.width = `calc(${newPercentage}% - 5px)`;
-                elements.previewSection.style.width = `calc(${100 - newPercentage}% - 5px)`;
+                // Limit between 20% and 80%
+                state.editorSplit = Math.max(20, Math.min(80, newPercentage));
+                updateEditorSplit();
             });
             
             document.addEventListener('mouseup', () => {
                 isDragging = false;
                 document.body.style.cursor = '';
             });
+            
+            // Mobile view toggle
+            elements.viewToggle.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const view = btn.dataset.view;
+                    elements.viewToggle.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    if (view === 'editor') {
+                        elements.codeEditor.style.display = 'block';
+                        elements.previewContainer.style.display = 'none';
+                    } else {
+                        elements.codeEditor.style.display = 'none';
+                        elements.previewContainer.style.display = 'block';
+                        runCode();
+                    }
+                });
+            });
+            
+            // Toggle sidebar on mobile
+            elements.toggleSidebar.addEventListener('click', () => {
+                elements.sidebar.classList.toggle('active');
+            });
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768 && 
+                    !elements.sidebar.contains(e.target) && 
+                    e.target !== elements.toggleSidebar) {
+                    elements.sidebar.classList.remove('active');
+                }
+            });
+            
+            // Save before unload
+            window.addEventListener('beforeunload', () => {
+                if (state.isLoggedIn) {
+                    saveToLocalStorage();
+                }
+            });
         }
 
-        // Show the add file modal
-        function showAddFileModal() {
-            elements.addFileModal.style.display = 'flex';
-            elements.newFilename.value = '';
+        // Update editor split
+        function updateEditorSplit() {
+            elements.codeEditor.style.width = `${state.editorSplit}%`;
+            elements.previewContainer.style.width = `${100 - state.editorSplit}%`;
+        }
+
+        // Show new file modal
+        function showNewFileModal() {
+            elements.newFileModal.style.display = 'flex';
+            elements.fileName.value = '';
             elements.fileType.value = 'html';
-            elements.newFilename.focus();
+            elements.fileName.focus();
         }
 
-        // Hide the add file modal
-        function hideAddFileModal() {
-            elements.addFileModal.style.display = 'none';
+        // Hide new file modal
+        function hideNewFileModal() {
+            elements.newFileModal.style.display = 'none';
         }
 
-        // Create a new file
+        // Create new file
         function createNewFile() {
-            const filename = elements.newFilename.value.trim();
+            const filename = elements.fileName.value.trim();
             const fileType = elements.fileType.value;
             
             if (!filename) {
-                alert('Please enter a filename');
+                showNotification('Please enter a filename', 'error');
                 return;
             }
             
@@ -548,13 +1366,17 @@ print(factorial(5))`
             state.files[fullFilename] = {
                 name: fullFilename,
                 type: fileType,
-                content: defaultContent
+                content: defaultContent,
+                active: false
             };
             
             // Refresh the file list and open the new file
             renderFileList();
+            renderEditorTabs();
             openFile(fullFilename);
-            hideAddFileModal();
+            hideNewFileModal();
+            
+            showNotification(`Created new file: ${fullFilename}`);
         }
 
         // Delete a file
@@ -563,160 +1385,110 @@ print(factorial(5))`
                 delete state.files[filename];
                 
                 // If we're deleting the current file, clear the editor
-                if (state.currentFile?.name === filename) {
-                    state.currentFile = null;
-                    elements.codeEditor.value = '';
-                    elements.filenameDisplay.textContent = 'No file selected';
-                    elements.outputPreview.innerHTML = '';
-                    elements.consoleOutput.textContent = '';
+                if (state.currentFile === filename) {
+                    const remainingFiles = Object.keys(state.files);
+                    if (remainingFiles.length > 0) {
+                        openFile(remainingFiles[0]);
+                    } else {
+                        state.currentFile = null;
+                        elements.codeEditor.value = '';
+                        elements.outputPreview.innerHTML = '';
+                    }
                 }
                 
                 renderFileList();
+                renderEditorTabs();
+                
+                showNotification(`Deleted file: ${filename}`);
             }
         }
 
-        // Open a file in the editor
-        function openFile(filename) {
-            const file = state.files[filename];
-            if (!file) return;
-            
-            state.currentFile = file;
-            elements.codeEditor.value = file.content;
-            elements.filenameDisplay.textContent = file.name;
-            
-            // Highlight the active file in the file list
-            document.querySelectorAll('.file-item').forEach(item => {
-                item.classList.remove('active');
-                if (item.textContent.includes(filename)) {
-                    item.classList.add('active');
-                }
-            });
-            
-            // Clear previous output
-            elements.outputPreview.innerHTML = '';
-            elements.consoleOutput.textContent = '';
-        }
-
-        // Save changes to the current file
-        function saveCurrentFile() {
-            if (state.currentFile) {
-                state.currentFile.content = elements.codeEditor.value;
-            }
-        }
-
-        // Run the current code
-        function runCode() {
-            if (!state.currentFile) {
-                alert('No file selected');
+        // Close a tab
+        function closeTab(filename) {
+            if (Object.keys(state.files).length <= 1) {
+                showNotification('Cannot close the last file', 'error');
                 return;
             }
             
-            saveCurrentFile();
-            elements.consoleOutput.textContent = '';
-            
-            // Capture console.log output
-            const originalConsoleLog = console.log;
-            let consoleOutput = '';
-            
-            console.log = function(message) {
-                if (typeof message === 'object') {
-                    consoleOutput += JSON.stringify(message) + '\n';
-                } else {
-                    consoleOutput += message + '\n';
-                }
-                originalConsoleLog.apply(console, arguments);
-            };
-            
-            try {
-                switch (state.currentFile.type) {
-                    case 'html':
-                        elements.outputPreview.innerHTML = state.currentFile.content;
-                        break;
-                        
-                    case 'css':
-                        elements.outputPreview.innerHTML = `
-                            <style>${state.currentFile.content}</style>
-                            <div class="css-preview-box">
-                                <h1>CSS Preview</h1>
-                                <p>This is a preview of your CSS styles.</p>
-                                <button class="sample-btn">Sample Button</button>
-                                <div class="sample-box" style="width: 100px; height: 100px; margin: 10px 0;"></div>
-                            </div>
-                        `;
-                        break;
-                        
-                    case 'js':
-                        // Clear previous output
-                        elements.outputPreview.innerHTML = '<div class="js-output"></div>';
-                        
-                        // Execute the JavaScript code
-                        const result = eval(state.currentFile.content);
-                        
-                        // Display the return value (if any)
-                        if (result !== undefined) {
-                            elements.outputPreview.innerHTML += `<div class="return-value"><strong>Return Value:</strong> ${JSON.stringify(result)}</div>`;
-                        }
-                        break;
-                        
-                    case 'py':
-                        // Execute Python code using Brython
-                        brython(1, () => {
-                            try {
-                                const output = [];
-                                const originalPrint = __BRYTHON__.builtins.print;
-                                
-                                __BRYTHON__.builtins.print = function() {
-                                    const args = Array.from(arguments).map(arg => 
-                                        typeof arg === 'object' ? JSON.stringify(arg) : arg
-                                    );
-                                    output.push(args.join(' '));
-                                    originalPrint.apply(this, arguments);
-                                };
-                                
-                                __BRYTHON__.run_python(state.currentFile.content, 'exec');
-                                elements.outputPreview.innerHTML = `<pre>${output.join('\n')}</pre>`;
-                                
-                                // Restore original print
-                                __BRYTHON__.builtins.print = originalPrint;
-                            } catch (error) {
-                                elements.outputPreview.innerHTML = `<div class="error">Python Error: ${error}</div>`;
-                            }
-                        });
-                        break;
-                }
-            } catch (error) {
-                elements.outputPreview.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-            }
-            
-            // Display console output
-            if (consoleOutput) {
-                elements.consoleOutput.textContent = consoleOutput;
-            }
-            
-            // Restore original console.log
-            console.log = originalConsoleLog;
+            deleteFile(filename);
         }
 
-        // Initialize Brython Python runtime
-        function setupBrython() {
-            if (typeof __BRYTHON__ === 'undefined') return;
+        // Show login modal
+        function showLoginModal() {
+            elements.loginModal.style.display = 'flex';
+            elements.loginEmail.value = '';
+            elements.loginPassword.value = '';
+            elements.loginEmail.focus();
+        }
+
+        // Hide login modal
+        function hideLoginModal() {
+            elements.loginModal.style.display = 'none';
+        }
+
+        // Handle login
+        function handleLogin() {
+            const email = elements.loginEmail.value.trim();
+            const password = elements.loginPassword.value.trim();
             
-            // Add a run_python function to the global scope
-            __BRYTHON__.run_python = function(src, mode) {
-                try {
-                    return __BRYTHON__.$py_src_to_js(src, mode);
-                } catch (err) {
-                    throw err;
-                }
+            if (!email || !password) {
+                showNotification('Please enter both email and password', 'error');
+                return;
+            }
+            
+            // Mock login - in a real app, you would authenticate with a server
+            state.user = {
+                name: email.split('@')[0],
+                email: email
             };
+            state.isLoggedIn = true;
+            
+            // Save user to localStorage
+            localStorage.setItem('codeplay_user', JSON.stringify(state.user));
+            
+            // Update UI
+            updateLoginUI();
+            hideLoginModal();
+            
+            // Restore saved state
+            restoreState();
+            
+            showNotification(`Welcome back, ${state.user.name}!`);
+        }
+
+        // Handle social login
+        function handleSocialLogin(provider) {
+            // Mock social login
+            const randomName = `User${Math.floor(Math.random() * 1000)}`;
+            const email = `${randomName.toLowerCase()}@${provider}.com`;
+            
+            state.user = {
+                name: randomName,
+                email: email
+            };
+            state.isLoggedIn = true;
+            
+            // Save user to localStorage
+            localStorage.setItem('codeplay_user', JSON.stringify(state.user));
+            
+            // Update UI
+            updateLoginUI();
+            hideLoginModal();
+            
+            // Restore saved state
+            restoreState();
+            
+            showNotification(`Welcome, ${randomName}! (${provider} login)`);
         }
 
         // Start the application
         window.addEventListener('load', () => {
             init();
-            setupBrython();
+            
             // Open index.html by default
-            openFile('index.html');
+            if (state.currentFile) {
+                openFile(state.currentFile);
+            }
         });
     </script>
 </body>
