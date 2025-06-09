@@ -3,720 +3,1211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All-in-One Code Tester</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.10.5/brython.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.10.5/brython_stdlib.min.js"></script>
+    <title>ShadowPeak Studios</title>
     <style>
         /* Global Styles */
+        :root {
+            --primary: #e63946;
+            --secondary: #1d3557;
+            --dark: #0a0a0a;
+            --light: #f1faee;
+            --accent: #457b9d;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
         body {
-            background-color: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+            position: relative;
         }
-
-        header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .main-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        /* File Explorer */
-        .file-explorer {
-            width: 250px;
-            background-color: #34495e;
-            color: white;
-            padding: 1rem;
-            overflow-y: auto;
-        }
-
-        .file-explorer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .add-file-btn {
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            padding: 0.3rem 0.6rem;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .file-list {
-            list-style: none;
-        }
-
-        .file-item {
-            padding: 0.5rem;
-            cursor: pointer;
-            border-radius: 4px;
-            margin-bottom: 0.3rem;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .file-item:hover {
-            background-color: #3d566e;
-        }
-
-        .file-item.active {
-            background-color: #2980b9;
-        }
-
-        .file-actions {
-            display: none;
-        }
-
-        .file-item:hover .file-actions {
-            display: flex;
-            gap: 0.3rem;
-        }
-
-        .file-action {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-
-        /* Editor Section */
-        .editor-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .editor-toolbar {
-            background-color: #ecf0f1;
-            padding: 0.5rem 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .filename-display {
-            font-weight: bold;
-        }
-
-        .run-btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .editor-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .code-editor {
-            flex: 1;
-            padding: 1rem;
-            border: none;
-            resize: none;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            background-color: #f8f9fa;
-            outline: none;
-        }
-
-        /* Preview Section */
-        .preview-section {
-            flex: 1;
-            padding: 1rem;
-            overflow: auto;
-            background-color: white;
-            border-left: 1px solid #ddd;
-        }
-
-        .preview-title {
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-            color: #7f8c8d;
-        }
-
-        /* Splitter */
-        .splitter {
-            width: 5px;
-            background-color: #ddd;
-            cursor: col-resize;
-        }
-
-        /* Add File Modal */
-        .modal {
-            display: none;
+        
+        /* Particles Background */
+        #particles-js {
             position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+        }
+        
+        /* Navigation */
+        nav {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid var(--primary);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo img {
+            height: 40px;
+            filter: drop-shadow(0 0 5px var(--primary));
+            animation: pulse 2s infinite;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(230, 57, 70, 0.3);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 600;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .hamburger {
+            display: none;
+            cursor: pointer;
+        }
+        
+        /* Main Content */
+        main {
+            margin-top: 80px;
+            min-height: calc(100vh - 160px);
+            padding: 2rem;
+        }
+        
+        /* Home Section */
+        #home {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 80vh;
+            padding: 2rem;
+        }
+        
+        .hero {
+            max-width: 800px;
+        }
+        
+        .hero h2 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: fadeIn 1s ease;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            opacity: 0;
+            animation: fadeIn 1s ease 0.5s forwards;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            opacity: 0;
+            animation: fadeIn 1s ease 1s forwards;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: var(--light);
+            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--light);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(230, 57, 70, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
+            background: linear-gradient(45deg, transparent 25%, rgba(255, 255, 255, 0.1) 50%, transparent 75%);
+            background-size: 400% 400%;
+            opacity: 0;
+            transition: all 0.5s ease;
         }
-
-        .modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            width: 400px;
-            max-width: 90%;
+        
+        .btn:hover::after {
+            opacity: 1;
+            animation: shine 1.5s infinite;
         }
-
-        .modal-header {
+        
+        /* About Section */
+        #about {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .team {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+        }
+        
+        .member {
+            background: rgba(29, 53, 87, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            width: 350px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(69, 123, 157, 0.3);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .member.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .member:nth-child(1) {
+            animation: fadeInUp 0.8s ease 0.2s forwards;
+        }
+        
+        .member:nth-child(2) {
+            animation: fadeInUp 0.8s ease 0.4s forwards;
+        }
+        
+        .member:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+        }
+        
+        .member-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            margin: 0 auto 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .member h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .member .role {
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .member p {
+            line-height: 1.6;
             margin-bottom: 1.5rem;
         }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
         }
-
-        .form-group {
+        
+        .social-links a {
+            color: var(--light);
+            background: rgba(69, 123, 157, 0.3);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        /* Development Section */
+        #development {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .code-container {
+            background: #1a1a2e;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .code-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .code-header {
+            background: #0a0a0a;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        
+        .code-dots {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .dot-red {
+            background: #ff5f56;
+        }
+        
+        .dot-yellow {
+            background: #ffbd2e;
+        }
+        
+        .dot-green {
+            background: #27c93f;
+        }
+        
+        .code-title {
+            margin-left: 1rem;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        .code-content {
+            padding: 1.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+        }
+        
+        pre {
+            margin: 0;
+            line-height: 1.5;
+        }
+        
+        .token.comment {
+            color: #6a9955;
+        }
+        
+        .token.keyword {
+            color: #569cd6;
+        }
+        
+        .token.string {
+            color: #ce9178;
+        }
+        
+        .token.function {
+            color: #dcdcaa;
+        }
+        
+        .token.tag {
+            color: #569cd6;
+        }
+        
+        .token.attr-name {
+            color: #9cdcfe;
+        }
+        
+        .token.attr-value {
+            color: #ce9178;
+        }
+        
+        .security-tips {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+        
+        .tip-card {
+            background: rgba(29, 53, 87, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(69, 123, 157, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .tip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+        }
+        
+        .tip-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tip-card h3 i {
+            font-size: 1.2rem;
+        }
+        
+        .tip-card p {
+            line-height: 1.6;
+        }
+        
+        /* Contact Section */
+        #contact {
+            padding: 4rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .contact-card {
+            background: rgba(29, 53, 87, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(69, 123, 157, 0.3);
+            backdrop-filter: blur(5px);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+        }
+        
+        .contact-card h3 {
+            color: var(--primary);
             margin-bottom: 1rem;
         }
-
-        .form-group label {
-            display: block;
+        
+        .contact-card p {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .discord-btn {
+            background: #5865F2;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .discord-btn:hover {
+            background: #4752c4;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(88, 101, 242, 0.4);
+        }
+        
+        /* Terms Section */
+        #terms {
+            padding: 4rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .terms-content {
+            background: rgba(29, 53, 87, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(69, 123, 157, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .terms-content h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .terms-content h3 {
+            color: var(--accent);
+            margin: 1.5rem 0 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .terms-content p {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .terms-content ul {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .terms-content li {
+            line-height: 1.6;
             margin-bottom: 0.5rem;
-            font-weight: bold;
         }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        
+        /* Footer */
+        footer {
+            background: rgba(10, 10, 10, 0.8);
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--primary);
+            backdrop-filter: blur(10px);
         }
-
-        .modal-footer {
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
+            flex-direction: column;
+            gap: 1.5rem;
         }
-
-        .btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
         }
-
-        .btn-primary {
-            background-color: #3498db;
-            color: white;
+        
+        .footer-links a {
+            color: var(--light);
+            text-decoration: none;
+            transition: all 0.3s ease;
         }
-
-        .btn-secondary {
-            background-color: #95a5a6;
-            color: white;
+        
+        .footer-links a:hover {
+            color: var(--primary);
         }
-
-        /* Console Output */
-        #console-output {
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            padding: 0.5rem;
-            font-family: monospace;
-            white-space: pre-wrap;
-            max-height: 150px;
-            overflow-y: auto;
-            margin-top: 1rem;
-            border-radius: 4px;
+        
+        .copyright {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shine {
+            0% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: rgba(10, 10, 10, 0.95);
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 3rem;
+                transition: all 0.5s ease;
+                backdrop-filter: blur(10px);
+            }
+            
+            .nav-links.active {
+                left: 0;
+            }
+            
+            .hamburger {
+                display: block;
+            }
+            
+            .hero h2 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+        
+        /* Page Transitions */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .page.active {
+            display: block;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body onload="brython()">
-    <header>
-        <div class="logo">Code Tester</div>
-        <div>
-            <button id="new-file-btn" class="run-btn">+ New File</button>
+<body>
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+    
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">
+            <img src="https://via.placeholder.com/40" alt="Logo" id="logo-img">
+            <h1>ShadowPeak</h1>
         </div>
-    </header>
-
-    <div class="main-container">
-        <div class="file-explorer">
-            <div class="file-explorer-header">
-                <h3>Files</h3>
-                <button class="add-file-btn" id="add-file-btn">+</button>
-            </div>
-            <ul class="file-list" id="file-list">
-                <!-- Files will be added here dynamically -->
-            </ul>
+        <div class="nav-links" id="navLinks">
+            <a href="#" class="nav-link active" data-page="home">Home</a>
+            <a href="#" class="nav-link" data-page="about">About Us</a>
+            <a href="#" class="nav-link" data-page="development">Development</a>
+            <a href="#" class="nav-link" data-page="contact">Contact Us</a>
+            <a href="#" class="nav-link" data-page="terms">Terms</a>
         </div>
-
-        <div class="editor-section">
-            <div class="editor-toolbar">
-                <div class="filename-display" id="filename-display">No file selected</div>
-                <button class="run-btn" id="run-code-btn">Run Code</button>
-            </div>
-            <div class="editor-container">
-                <textarea id="code-editor" class="code-editor" placeholder="Select or create a file to start coding..."></textarea>
-                <div class="splitter" id="splitter"></div>
-                <div class="preview-section" id="preview-section">
-                    <div class="preview-title">Output Preview</div>
-                    <div id="output-preview"></div>
-                    <div id="console-output"></div>
+        <div class="hamburger" id="hamburger">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main>
+        <!-- Home Page -->
+        <section class="page active" id="home-page">
+            <div id="home">
+                <div class="hero">
+                    <h2>Welcome to ShadowPeak Studios</h2>
+                    <p>We create amazing Minecraft experiences and develop cutting-edge websites with stunning designs and robust functionality. Our passion for gaming and coding drives us to deliver exceptional results.</p>
+                    <div class="cta-buttons">
+                        <a href="#" class="btn btn-primary" data-page="about">Meet Our Team</a>
+                        <a href="#" class="btn btn-secondary" data-page="development">View Our Work</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Add File Modal -->
-    <div class="modal" id="add-file-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Create New File</h3>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="form-group">
-                <label for="new-filename">File Name</label>
-                <input type="text" id="new-filename" placeholder="e.g., index.html">
-            </div>
-            <div class="form-group">
-                <label for="file-type">File Type</label>
-                <select id="file-type">
-                    <option value="html">HTML</option>
-                    <option value="css">CSS</option>
-                    <option value="js">JavaScript</option>
-                    <option value="py">Python</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancel-add-file">Cancel</button>
-                <button class="btn btn-primary" id="confirm-add-file">Create</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // File system and application state
-        const state = {
-            files: {
-                'index.html': {
-                    name: 'index.html',
-                    type: 'html',
-                    content: `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Page</title>
-</head>
-<body>
-    <h1>Hello World!</h1>
-    <p>Welcome to my page.</p>
-</body>
-</html>`
-                },
-                'style.css': {
-                    name: 'style.css',
-                    type: 'css',
-                    content: `body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 20px;
-    background-color: #f4f4f4;
-}
-
-h1 {
-    color: #333;
-}`
-                },
-                'script.js': {
-                    name: 'script.js',
-                    type: 'js',
-                    content: `console.log('Hello from JavaScript!');
-
-function greet(name) {
-    return 'Hello, ' + name + '!';
-}
-
-// Try calling the function
-console.log(greet('World'));`
-                },
-                'main.py': {
-                    name: 'main.py',
-                    type: 'py',
-                    content: `print("Hello from Python!")
-
-def factorial(n):
-    if n == 0:
-        return 1
-    else:
-        return n * factorial(n-1)
-
-# Test the function
-print(factorial(5))`
-                }
-            },
-            currentFile: null
-        };
-
-        // DOM elements
-        const elements = {
-            fileList: document.getElementById('file-list'),
-            codeEditor: document.getElementById('code-editor'),
-            filenameDisplay: document.getElementById('filename-display'),
-            outputPreview: document.getElementById('output-preview'),
-            consoleOutput: document.getElementById('console-output'),
-            runCodeBtn: document.getElementById('run-code-btn'),
-            addFileBtn: document.getElementById('add-file-btn'),
-            newFileBtn: document.getElementById('new-file-btn'),
-            addFileModal: document.getElementById('add-file-modal'),
-            newFilename: document.getElementById('new-filename'),
-            fileType: document.getElementById('file-type'),
-            cancelAddFile: document.getElementById('cancel-add-file'),
-            confirmAddFile: document.getElementById('confirm-add-file'),
-            closeModal: document.querySelector('.close-modal'),
-            splitter: document.getElementById('splitter'),
-            previewSection: document.getElementById('preview-section')
-        };
-
-        // Initialize the application
-        function init() {
-            renderFileList();
-            setupEventListeners();
-            setupSplitter();
-        }
-
-        // Render the file list
-        function renderFileList() {
-            elements.fileList.innerHTML = '';
-            
-            Object.values(state.files).forEach(file => {
-                const fileItem = document.createElement('li');
-                fileItem.className = `file-item ${state.currentFile?.name === file.name ? 'active' : ''}`;
-                fileItem.innerHTML = `
-                    <span>${file.name}</span>
-                    <div class="file-actions">
-                        <button class="file-action" data-action="delete" data-filename="${file.name}">🗑️</button>
+        </section>
+        
+        <!-- About Us Page -->
+        <section class="page" id="about-page">
+            <div id="about">
+                <h2 class="section-title">About Our Team</h2>
+                <div class="team">
+                    <div class="member">
+                        <img src="https://via.placeholder.com/150" alt="PRO GAMER" class="member-img">
+                        <h3>PRO GAMER</h3>
+                        <span class="role">Minecraft & Web Developer</span>
+                        <p>Hi, I'm PRO GAMER (real name: Mihad). I'm a 15-year-old Minecraft server and website developer from Bangladesh. I specialize in creating immersive Minecraft experiences and developing modern, responsive websites. With a passion for both gaming and coding, I bring creative solutions to every project I work on.</p>
+                        <p>When I'm not coding, you can find me exploring new Minecraft mods or competing in PvP tournaments. My goal is to combine my love for gaming with my technical skills to create amazing digital experiences.</p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-discord"></i></a>
+                            <a href="#"><i class="fab fa-youtube"></i></a>
+                            <a href="#"><i class="fab fa-github"></i></a>
+                        </div>
                     </div>
-                `;
-                fileItem.addEventListener('click', () => openFile(file.name));
-                elements.fileList.appendChild(fileItem);
-            });
-        }
-
-        // Set up event listeners
-        function setupEventListeners() {
-            // File operations
-            elements.addFileBtn.addEventListener('click', showAddFileModal);
-            elements.newFileBtn.addEventListener('click', showAddFileModal);
-            elements.cancelAddFile.addEventListener('click', hideAddFileModal);
-            elements.closeModal.addEventListener('click', hideAddFileModal);
-            elements.confirmAddFile.addEventListener('click', createNewFile);
-            
-            // Code execution
-            elements.runCodeBtn.addEventListener('click', runCode);
-            
-            // Editor changes
-            elements.codeEditor.addEventListener('input', saveCurrentFile);
-            
-            // Handle delete file actions
-            document.addEventListener('click', (e) => {
-                if (e.target.dataset.action === 'delete') {
-                    deleteFile(e.target.dataset.filename);
-                }
-            });
-        }
-
-        // Set up the splitter between editor and preview
-        function setupSplitter() {
-            let isDragging = false;
-            
-            elements.splitter.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                document.body.style.cursor = 'col-resize';
-                e.preventDefault();
-            });
-            
-            document.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
+                    
+                    <div class="member">
+                        <img src="https://via.placeholder.com/150" alt="Shadow Peak" class="member-img">
+                        <h3>Shadow Peak</h3>
+                        <span class="role">Web Developer & Minecraft PvPer</span>
+                        <p>Hey there! I'm Shadow Peak, a 13-year-old website developer and Minecraft PvP enthusiast in 9th grade. I'm the chill guy of the team who loves to create clean, efficient code while jamming to my favorite music.</p>
+                        <p>My expertise lies in front-end development with HTML, CSS, and JavaScript. I enjoy making websites that are not only functional but also visually stunning. In the Minecraft world, I'm known for my quick reflexes and strategic gameplay in PvP battles.</p>
+                        <p>I believe in continuous learning and always stay updated with the latest web technologies to deliver the best results for our projects.</p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-discord"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Development Page -->
+        <section class="page" id="development-page">
+            <div id="development">
+                <h2 class="section-title">Development Showcase</h2>
                 
-                const containerWidth = document.querySelector('.editor-container').offsetWidth;
-                const newWidth = e.clientX - elements.codeEditor.getBoundingClientRect().left;
-                const newPercentage = (newWidth / containerWidth) * 100;
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="code-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="code-title">index.html</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Modern Website&lt;/title&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header class="hero"&gt;
+        &lt;h1&gt;Welcome to Our Site&lt;/h1&gt;
+        &lt;p&gt;A modern, responsive website built with love&lt;/p&gt;
+        &lt;a href="#features" class="btn"&gt;Explore&lt;/a&gt;
+    &lt;/header&gt;
+    
+    &lt;script src="script.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                    </div>
+                </div>
                 
-                elements.codeEditor.style.width = `calc(${newPercentage}% - 5px)`;
-                elements.previewSection.style.width = `calc(${100 - newPercentage}% - 5px)`;
-            });
-            
-            document.addEventListener('mouseup', () => {
-                isDragging = false;
-                document.body.style.cursor = '';
-            });
-        }
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="code-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="code-title">style.css</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code>:root {
+    --primary: #e63946;
+    --secondary: #1d3557;
+    --dark: #0a0a0a;
+    --light: #f1faee;
+}
 
-        // Show the add file modal
-        function showAddFileModal() {
-            elements.addFileModal.style.display = 'flex';
-            elements.newFilename.value = '';
-            elements.fileType.value = 'html';
-            elements.newFilename.focus();
-        }
+.hero {
+    background: linear-gradient(135deg, var(--secondary), var(--dark));
+    color: var(--light);
+    padding: 4rem 2rem;
+    text-align: center;
+}
 
-        // Hide the add file modal
-        function hideAddFileModal() {
-            elements.addFileModal.style.display = 'none';
-        }
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background: var(--primary);
+    color: white;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
 
-        // Create a new file
-        function createNewFile() {
-            const filename = elements.newFilename.value.trim();
-            const fileType = elements.fileType.value;
-            
-            if (!filename) {
-                alert('Please enter a filename');
-                return;
-            }
-            
-            // Add extension if not provided
-            let fullFilename = filename.includes('.') ? filename : `${filename}.${fileType}`;
-            
-            // Default content based on file type
-            let defaultContent = '';
-            switch (fileType) {
-                case 'html':
-                    defaultContent = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${filename.replace('.html', '')}</title>
-</head>
-<body>
-    <!-- Your HTML content here -->
-</body>
-</html>`;
-                    break;
-                case 'css':
-                    defaultContent = `/* ${filename} styles */`;
-                    break;
-                case 'js':
-                    defaultContent = `// ${filename} JavaScript\nconsole.log('Hello from ${filename}');`;
-                    break;
-                case 'py':
-                    defaultContent = `# ${filename} Python\nprint("Hello from ${filename}")`;
-                    break;
-            }
-            
-            // Add the new file
-            state.files[fullFilename] = {
-                name: fullFilename,
-                type: fileType,
-                content: defaultContent
-            };
-            
-            // Refresh the file list and open the new file
-            renderFileList();
-            openFile(fullFilename);
-            hideAddFileModal();
-        }
-
-        // Delete a file
-        function deleteFile(filename) {
-            if (confirm(`Are you sure you want to delete ${filename}?`)) {
-                delete state.files[filename];
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(230, 57, 70, 0.4);
+}</code></pre>
+                    </div>
+                </div>
                 
-                // If we're deleting the current file, clear the editor
-                if (state.currentFile?.name === filename) {
-                    state.currentFile = null;
-                    elements.codeEditor.value = '';
-                    elements.filenameDisplay.textContent = 'No file selected';
-                    elements.outputPreview.innerHTML = '';
-                    elements.consoleOutput.textContent = '';
-                }
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="code-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <div class="code-title">script.js</div>
+                    </div>
+                    <div class="code-content">
+                        <pre><code>// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+});
+
+// Animate elements when they come into view
+const animateOnScroll = () => {
+    const elements = document.querySelectorAll('.animate');
+    
+    elements.forEach(element => {
+        const elementPosition = element.getBoundingClientRect().top;
+        const screenPosition = window.innerHeight / 1.3;
+        
+        if (elementPosition < screenPosition) {
+            element.classList.add('animated');
+        }
+    });
+};
+
+window.addEventListener('scroll', animateOnScroll);</code></pre>
+                    </div>
+                </div>
                 
-                renderFileList();
-            }
-        }
-
-        // Open a file in the editor
-        function openFile(filename) {
-            const file = state.files[filename];
-            if (!file) return;
-            
-            state.currentFile = file;
-            elements.codeEditor.value = file.content;
-            elements.filenameDisplay.textContent = file.name;
-            
-            // Highlight the active file in the file list
-            document.querySelectorAll('.file-item').forEach(item => {
-                item.classList.remove('active');
-                if (item.textContent.includes(filename)) {
-                    item.classList.add('active');
-                }
-            });
-            
-            // Clear previous output
-            elements.outputPreview.innerHTML = '';
-            elements.consoleOutput.textContent = '';
-        }
-
-        // Save changes to the current file
-        function saveCurrentFile() {
-            if (state.currentFile) {
-                state.currentFile.content = elements.codeEditor.value;
-            }
-        }
-
-        // Run the current code
-        function runCode() {
-            if (!state.currentFile) {
-                alert('No file selected');
-                return;
-            }
-            
-            saveCurrentFile();
-            elements.consoleOutput.textContent = '';
-            
-            // Capture console.log output
-            const originalConsoleLog = console.log;
-            let consoleOutput = '';
-            
-            console.log = function(message) {
-                if (typeof message === 'object') {
-                    consoleOutput += JSON.stringify(message) + '\n';
-                } else {
-                    consoleOutput += message + '\n';
-                }
-                originalConsoleLog.apply(console, arguments);
-            };
-            
-            try {
-                switch (state.currentFile.type) {
-                    case 'html':
-                        elements.outputPreview.innerHTML = state.currentFile.content;
-                        break;
-                        
-                    case 'css':
-                        elements.outputPreview.innerHTML = `
-                            <style>${state.currentFile.content}</style>
-                            <div class="css-preview-box">
-                                <h1>CSS Preview</h1>
-                                <p>This is a preview of your CSS styles.</p>
-                                <button class="sample-btn">Sample Button</button>
-                                <div class="sample-box" style="width: 100px; height: 100px; margin: 10px 0;"></div>
-                            </div>
-                        `;
-                        break;
-                        
-                    case 'js':
-                        // Clear previous output
-                        elements.outputPreview.innerHTML = '<div class="js-output"></div>';
-                        
-                        // Execute the JavaScript code
-                        const result = eval(state.currentFile.content);
-                        
-                        // Display the return value (if any)
-                        if (result !== undefined) {
-                            elements.outputPreview.innerHTML += `<div class="return-value"><strong>Return Value:</strong> ${JSON.stringify(result)}</div>`;
+                <h2 class="section-title" style="margin-top: 4rem;">Web Security Tips</h2>
+                <div class="security-tips">
+                    <div class="tip-card">
+                        <h3><i class="fas fa-shield-alt"></i> Secure Authentication</h3>
+                        <p>Always use strong, unique passwords and implement two-factor authentication (2FA) wherever possible. For websites, use bcrypt or Argon2 for password hashing.</p>
+                    </div>
+                    
+                    <div class="tip-card">
+                        <h3><i class="fas fa-lock"></i> HTTPS Everywhere</h3>
+                        <p>Ensure your website uses HTTPS with a valid SSL/TLS certificate. This encrypts data between the server and clients, preventing man-in-the-middle attacks.</p>
+                    </div>
+                    
+                    <div class="tip-card">
+                        <h3><i class="fas fa-code"></i> Input Validation</h3>
+                        <p>Always validate and sanitize user input on both client and server sides to prevent XSS (Cross-Site Scripting) and SQL injection attacks.</p>
+                    </div>
+                    
+                    <div class="tip-card">
+                        <h3><i class="fas fa-user-secret"></i> How Hackers Operate</h3>
+                        <p>Hackers often use automated tools to scan for vulnerabilities like outdated software, weak credentials, or misconfigured servers. Regular updates and security audits are essential.</p>
+                    </div>
+                    
+                    <div class="tip-card">
+                        <h3><i class="fas fa-database"></i> Data Protection</h3>
+                        <p>Implement proper access controls and encrypt sensitive data both in transit and at rest. Follow the principle of least privilege for database permissions.</p>
+                    </div>
+                    
+                    <div class="tip-card">
+                        <h3><i class="fas fa-cloud"></i> Secure Hosting</h3>
+                        <p>Choose reputable hosting providers with strong security measures. Regularly backup your data and test restoration procedures.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact Us Page -->
+        <section class="page" id="contact-page">
+            <div id="contact">
+                <h2 class="section-title">Get In Touch</h2>
+                <p>Have a project in mind or want to collaborate? Reach out to us through our Discord server or other platforms.</p>
+                
+                <div class="contact-info">
+                    <div class="contact-card">
+                        <h3>Join Our Discord</h3>
+                        <p>Connect with our community, get support, or discuss potential projects on our Discord server.</p>
+                        <a href="https://discord.gg/r528VAapEB" class="discord-btn" target="_blank">
+                            <i class="fab fa-discord"></i> Join Now
+                        </a>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <h3>Other Contact Methods</h3>
+                        <p><i class="fas fa-envelope"></i> Email: contact@shadowpeak.com</p>
+                        <p><i class="fab fa-twitter"></i> Twitter: @ShadowPeakDev</p>
+                        <p><i class="fab fa-github"></i> GitHub: ShadowPeak-Studios</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Terms Page -->
+        <section class="page" id="terms-page">
+            <div id="terms">
+                <h2 class="section-title">Terms of Service</h2>
+                
+                <div class="terms-content">
+                    <h2>1. Acceptance of Terms</h2>
+                    <p>By accessing or using any services provided by ShadowPeak Studios, you agree to be bound by these Terms of Service. If you do not agree to all the terms, you may not access or use our services.</p>
+                    
+                    <h3>2. Services Provided</h3>
+                    <p>We offer Minecraft server development, website design and development, and related digital services. All services are provided "as is" without warranties of any kind.</p>
+                    
+                    <h3>3. User Responsibilities</h3>
+                    <p>Users agree to:</p>
+                    <ul>
+                        <li>Provide accurate information when requesting services</li>
+                        <li>Not use our services for any illegal activities</li>
+                        <li>Respect intellectual property rights</li>
+                        <li>Not attempt to disrupt or compromise our services</li>
+                    </ul>
+                    
+                    <h3>4. Payment and Refunds</h3>
+                    <p>Payment terms will be specified in individual project agreements. Refund policies vary by service and will be communicated before engagement.</p>
+                    
+                    <h3>5. Intellectual Property</h3>
+                    <p>All original content created by ShadowPeak Studios remains our intellectual property unless otherwise agreed in writing. Clients retain rights to their own content and branding.</p>
+                    
+                    <h3>6. Limitation of Liability</h3>
+                    <p>ShadowPeak Studios shall not be liable for any indirect, incidental, or consequential damages resulting from the use or inability to use our services.</p>
+                    
+                    <h3>7. Changes to Terms</h3>
+                    <p>We reserve the right to modify these terms at any time. Continued use of our services after changes constitutes acceptance of the new terms.</p>
+                    
+                    <h3>8. Governing Law</h3>
+                    <p>These terms shall be governed by the laws of Bangladesh, without regard to its conflict of law provisions.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#" data-page="home">Home</a>
+                <a href="#" data-page="about">About</a>
+                <a href="#" data-page="development">Development</a>
+                <a href="#" data-page="contact">Contact</a>
+                <a href="#" data-page="terms">Terms</a>
+            </div>
+            <p class="copyright">© 2023 ShadowPeak Studios. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Initialize particles.js
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
                         }
-                        break;
-                        
-                    case 'py':
-                        // Execute Python code using Brython
-                        brython(1, () => {
-                            try {
-                                const output = [];
-                                const originalPrint = __BRYTHON__.builtins.print;
-                                
-                                __BRYTHON__.builtins.print = function() {
-                                    const args = Array.from(arguments).map(arg => 
-                                        typeof arg === 'object' ? JSON.stringify(arg) : arg
-                                    );
-                                    output.push(args.join(' '));
-                                    originalPrint.apply(this, arguments);
-                                };
-                                
-                                __BRYTHON__.run_python(state.currentFile.content, 'exec');
-                                elements.outputPreview.innerHTML = `<pre>${output.join('\n')}</pre>`;
-                                
-                                // Restore original print
-                                __BRYTHON__.builtins.print = originalPrint;
-                            } catch (error) {
-                                elements.outputPreview.innerHTML = `<div class="error">Python Error: ${error}</div>`;
+                    },
+                    "color": {
+                        "value": ["#e63946", "#457b9d", "#1d3557"]
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 2,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#e63946",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": true,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": true,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 1
                             }
-                        });
-                        break;
-                }
-            } catch (error) {
-                elements.outputPreview.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
             
-            // Display console output
-            if (consoleOutput) {
-                elements.consoleOutput.textContent = consoleOutput;
-            }
+            // Hamburger menu toggle
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
             
-            // Restore original console.log
-            console.log = originalConsoleLog;
-        }
-
-        // Initialize Brython Python runtime
-        function setupBrython() {
-            if (typeof __BRYTHON__ === 'undefined') return;
+            hamburger.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                hamburger.innerHTML = navLinks.classList.contains('active') ? 
+                    '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+            });
             
-            // Add a run_python function to the global scope
-            __BRYTHON__.run_python = function(src, mode) {
-                try {
-                    return __BRYTHON__.$py_src_to_js(src, mode);
-                } catch (err) {
-                    throw err;
-                }
+            // Page navigation
+            const navLinksAll = document.querySelectorAll('.nav-link');
+            const pages = document.querySelectorAll('.page');
+            
+            navLinksAll.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = link.getAttribute('data-page') + '-page';
+                    
+                    // Hide all pages
+                    pages.forEach(page => {
+                        page.classList.remove('active');
+                    });
+                    
+                    // Show selected page
+                    document.getElementById(pageId).classList.add('active');
+                    
+                    // Update active nav link
+                    navLinksAll.forEach(navLink => {
+                        navLink.classList.remove('active');
+                    });
+                    link.classList.add('active');
+                    
+                    // Close mobile menu if open
+                    if (navLinks.classList.contains('active')) {
+                        navLinks.classList.remove('active');
+                        hamburger.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                    
+                    // Scroll to top
+                    window.scrollTo(0, 0);
+                });
+            });
+            
+            // Footer links navigation
+            const footerLinks = document.querySelectorAll('.footer-links a');
+            footerLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = link.getAttribute('data-page') + '-page';
+                    
+                    // Hide all pages
+                    pages.forEach(page => {
+                        page.classList.remove('active');
+                    });
+                    
+                    // Show selected page
+                    document.getElementById(pageId).classList.add('active');
+                    
+                    // Update active nav link
+                    navLinksAll.forEach(navLink => {
+                        navLink.classList.remove('active');
+                        if (navLink.getAttribute('data-page') === link.getAttribute('data-page')) {
+                            navLink.classList.add('active');
+                        }
+                    });
+                    
+                    // Scroll to top
+                    window.scrollTo(0, 0);
+                });
+            });
+            
+            // Animate elements when they come into view
+            const animateOnScroll = () => {
+                const elements = document.querySelectorAll('.member, .code-container, .tip-card');
+                
+                elements.forEach(element => {
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const screenPosition = window.innerHeight / 1.3;
+                    
+                    if (elementPosition < screenPosition) {
+                        element.classList.add('visible');
+                    }
+                });
             };
-        }
-
-        // Start the application
-        window.addEventListener('load', () => {
-            init();
-            setupBrython();
-            // Open index.html by default
-            openFile('index.html');
+            
+            window.addEventListener('scroll', animateOnScroll);
+            animateOnScroll(); // Run once on load
+            
+            // Logo animation
+            const logoImg = document.getElementById('logo-img');
+            let isHovering = false;
+            
+            logoImg.addEventListener('mouseenter', () => {
+                if (!isHovering) {
+                    isHovering = true;
+                    logoImg.style.animation = 'float 2s ease-in-out';
+                    setTimeout(() => {
+                        logoImg.style.animation = '';
+                        isHovering = false;
+                    }, 2000);
+                }
+            });
         });
     </script>
 </body>
