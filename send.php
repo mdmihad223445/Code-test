@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Discord webhook URL
-define('DISCORD_WEBHOOK', 'YOUR_DISCORD_WEBHOOK_URL');
+define('DISCORD_WEBHOOK', 'https://discord.com/api/webhooks/1387669774061932574/_HgvB7Gh2pHGEf8Mu7ddrQArbs0dJ4yTw69kpiZ4lukHPxYZwlbMkVeUFzhz91mJ7Bh6');
 
 // Function to send embed to Discord
 function sendToDiscord($data) {
