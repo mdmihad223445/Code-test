@@ -1,7 +1,7 @@
 <?php
 // sendWebhook.php - Backend to forward data safely to Discord webhook
 
-$webhookURL = "https://discord.com/api/webhooks/XXXXXXXXXX/XXXXXXXXXXXXXXX";  // <-- Yahan apna asli webhook URL daalo
+$webhookURL = "https://discord.com/api/webhooks/1387669774061932574/_HgvB7Gh2pHGEf8Mu7ddrQArbs0dJ4yTw69kpiZ4lukHPxYZwlbMkVeUFzhz91mJ7Bh6";  // <-- Yahan apna asli webhook URL daalo
 
 // Check if POST request
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
