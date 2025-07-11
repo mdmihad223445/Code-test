@@ -3,67 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily News Network</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="config.js"></script>
+    <title>MineHost Pro - Premium Minecraft Hosting</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="webhook.js"></script>
+    <script src="particles.js"></script>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Daily News Network</h1>
-            <p>Your trusted source for the latest updates</p>
-        </div>
-    </header>
+    <!-- Nano Particles Background -->
+    <div id="particles-js"></div>
 
-    <nav>
+    <!-- Navigation -->
+    <nav class="navbar">
         <div class="container">
-            <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">World</a></li>
-                <li><a href="#">Politics</a></li>
-                <li><a href="#">Business</a></li>
-                <li><a href="#">Technology</a></li>
-                <li><a href="#">Sports</a></li>
+            <a href="#" class="logo">MineHost <span>Pro</span></a>
+            
+            <div class="hamburger" id="hamburger">
+                <div class="bar bar1"></div>
+                <div class="bar bar2"></div>
+                <div class="bar bar3"></div>
+            </div>
+            
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#products">Products</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#contact">Contact Us</a></li>
+                <li><a href="#clientarea" class="btn">Client Area</a></li>
             </ul>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="main-content">
-            <main class="articles">
-                <article>
-                    <h2>Global Summit Addresses Climate Change Concerns</h2>
-                    <p>World leaders gathered today to discuss urgent measures against climate change...</p>
-                    <a href="#" class="read-more">Read More</a>
-                </article>
-                <!-- More articles -->
-            </main>
+    <!-- Page Content -->
+    <div class="page-container">
+        <!-- Home Page -->
+        <section id="home" class="page active">
+            <div class="hero">
+                <div class="container">
+                    <h1 class="glitch" data-text="Premium Minecraft Hosting">Premium Minecraft Hosting</h1>
+                    <p>Experience lag-free gameplay with our high-performance servers</p>
+                    <div class="cta-buttons">
+                        <a href="#products" class="btn btn-primary">Get Started</a>
+                        <a href="#features" class="btn btn-secondary">Learn More</a>
+                    </div>
+                </div>
+            </div>
 
-            <aside class="sidebar">
-                <div class="sidebar-widget">
-                    <h3>Subscribe to Newsletter</h3>
-                    <form>
-                        <input type="email" placeholder="Your email address">
-                        <button type="submit">Subscribe</button>
+            <div class="features-grid">
+                <div class="feature-card floating">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Blazing Fast</h3>
+                    <p>SSD-powered servers with Intel Xeon processors</p>
+                </div>
+                <div class="feature-card floating delay-1">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>DDoS Protection</h3>
+                    <p>Enterprise-grade protection against attacks</p>
+                </div>
+                <div class="feature-card floating delay-2">
+                    <i class="fas fa-sliders-h"></i>
+                    <h3>Easy Control</h3>
+                    <p>Intuitive multicraft control panel</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Page -->
+        <section id="products" class="page">
+            <div class="container">
+                <h2>Our Hosting Plans</h2>
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <h3>Basic</h3>
+                        <div class="price">$5<span>/mo</span></div>
+                        <ul>
+                            <li>1GB RAM</li>
+                            <li>20GB SSD</li>
+                            <li>Unlimited Slots</li>
+                            <li>24/7 Support</li>
+                        </ul>
+                        <a href="#" class="btn">Order Now</a>
+                    </div>
+                    <div class="pricing-card popular">
+                        <div class="popular-badge">Most Popular</div>
+                        <h3>Premium</h3>
+                        <div class="price">$10<span>/mo</span></div>
+                        <ul>
+                            <li>4GB RAM</li>
+                            <li>50GB SSD</li>
+                            <li>Unlimited Slots</li>
+                            <li>Priority Support</li>
+                        </ul>
+                        <a href="#" class="btn">Order Now</a>
+                    </div>
+                    <div class="pricing-card">
+                        <h3>Enterprise</h3>
+                        <div class="price">$20<span>/mo</span></div>
+                        <ul>
+                            <li>8GB RAM</li>
+                            <li>100GB SSD</li>
+                            <li>Unlimited Slots</li>
+                            <li>Dedicated IP</li>
+                        </ul>
+                        <a href="#" class="btn">Order Now</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Page -->
+        <section id="features" class="page">
+            <div class="container">
+                <h2>Why Choose Us</h2>
+                <div class="features-accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3><i class="fas fa-server"></i> High Performance Hardware</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Our servers run on enterprise-grade hardware with Intel Xeon processors and NVMe SSDs for maximum performance.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3><i class="fas fa-shield-alt"></i> Advanced DDoS Protection</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>We provide enterprise-level DDoS protection to keep your server online even during attacks.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3><i class="fas fa-globe"></i> Global Locations</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p>Choose from multiple server locations worldwide to get the best ping for your players.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Page -->
+        <section id="contact" class="page">
+            <div class="container">
+                <h2>Contact Us</h2>
+                <div class="contact-grid">
+                    <div class="contact-info">
+                        <div class="info-card">
+                            <i class="fas fa-envelope"></i>
+                            <h3>Email</h3>
+                            <p>support@minehostpro.com</p>
+                        </div>
+                        <div class="info-card">
+                            <i class="fas fa-comment-alt"></i>
+                            <h3>Live Chat</h3>
+                            <p>Available 24/7</p>
+                        </div>
+                        <div class="info-card">
+                            <i class="fas fa-headset"></i>
+                            <h3>Support Ticket</h3>
+                            <p>Response within 1 hour</p>
+                        </div>
+                    </div>
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <input type="text" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea placeholder="Your Message" required></textarea>
+                        </div>
+                        <button type="submit" class="btn">Send Message</button>
                     </form>
                 </div>
-                <!-- More sidebar content -->
-            </aside>
-        </div>
+            </div>
+        </section>
     </div>
 
+    <!-- Footer -->
     <footer>
         <div class="container">
-            <p>&copy; 2023 Daily News Network. All rights reserved.</p>
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>MineHost Pro</h3>
+                    <p>Premium Minecraft server hosting with unbeatable performance and support.</p>
+                </div>
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#products">Products</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Refund Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Connect</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 MineHost Pro. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 
     <!-- Hidden elements -->
-    <div id="scan-warning" style="display:none;"></div>
+    <div id="inspect-warning"></div>
     <video class="hidden-video"></video>
 
     <!-- JavaScript files -->
-    <script src="anti-theft.js"></script>
+    <script src="protection.js"></script>
     <script src="scanner.js"></script>
+    
+    <script>
+        // Navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('nav-links');
+            const pages = document.querySelectorAll('.page');
+            const navItems = document.querySelectorAll('.nav-links a:not(.btn)');
+            
+            // Toggle mobile menu
+            hamburger.addEventListener('click', function() {
+                this.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+            
+            // Close mobile menu when clicking a link
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                    
+                    // Set active page
+                    const target = this.getAttribute('href');
+                    pages.forEach(page => page.classList.remove('active'));
+                    document.querySelector(target).classList.add('active');
+                    
+                    // Set active nav item
+                    navItems.forEach(navItem => navItem.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Initialize particles
+            particlesJS.load('particles-js', 'particles.json', function() {
+                console.log('Particles.js loaded');
+            });
+        });
+    </script>
 </body>
 </html>
